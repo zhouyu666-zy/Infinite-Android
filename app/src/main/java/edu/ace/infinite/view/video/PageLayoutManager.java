@@ -42,7 +42,7 @@ public class PageLayoutManager extends LinearLayoutManager implements RecyclerVi
             if (view != null) {
                 int position = getPosition(view);
                 if (mOnViewPagerListener != null) {  //倒数第二视频为底部
-                    mOnViewPagerListener.onPageSelected(position, position == getItemCount() - 2);
+                    mOnViewPagerListener.onPageSelected(position, position >= getItemCount() - 5);
                 }
             }
         }

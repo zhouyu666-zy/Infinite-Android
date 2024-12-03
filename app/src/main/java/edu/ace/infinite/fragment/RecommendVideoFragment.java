@@ -21,6 +21,7 @@ import edu.ace.infinite.R;
 import edu.ace.infinite.activity.BaseActivity;
 import edu.ace.infinite.adapter.VideoAdapter;
 import edu.ace.infinite.pojo.Video;
+import edu.ace.infinite.utils.ConsoleUtils;
 import edu.ace.infinite.utils.http.VideoHttpUtils;
 import edu.ace.infinite.view.video.OnViewPagerListener;
 import edu.ace.infinite.view.video.PageLayoutManager;
@@ -66,7 +67,7 @@ public class RecommendVideoFragment extends BaseFragment {
 
     private void initVideoRecyclerView(List<Video.Data> videoList) {
         videoRecyclerView = findViewById(R.id.videoRecyclerView);
-        videoRecyclerView.setItemViewCacheSize(1); //保留几条视频的播放信息
+        videoRecyclerView.setItemViewCacheSize(0); //保留几条视频的播放信息
 
         PageLayoutManager pageLayoutManager = new PageLayoutManager(activity, OrientationHelper.VERTICAL, false);
         videoRecyclerView.setLayoutManager(pageLayoutManager);
@@ -76,21 +77,26 @@ public class RecommendVideoFragment extends BaseFragment {
         pageLayoutManager.setOnViewPagerListener(new OnViewPagerListener() {
             @Override
             public void onPageRelease(boolean isNext, int position) {
-                Log.e(TAG, "释放位置:" + position);
+                ConsoleUtils.logErr(TAG, "释放位置:" + position);
                 pauseVideo(position);
             }
 
+            private boolean isLoadMore = false;
             @Override
             public void onPageSelected(int position, boolean isBottom) {
-                Log.e(TAG, "选择位置:" + position + "，是否为底部:" + isBottom);
+                ConsoleUtils.logErr(TAG, "选择位置:" + position + "，是否为底部:" + isBottom);
                 playVideo(position);
 
                 if(isBottom){
-                    //视频为底部时，加载更多视频
-                    new Thread(() -> {
-                        Video video = VideoHttpUtils.getRecommentVideo();
-                        videoAdapter.addVideo(video.getData());
-                    }).start();
+                    if(!isLoadMore){
+                        //视频为底部时，加载更多视频
+                        new Thread(() -> {
+                            isLoadMore = true;
+                            Video video = VideoHttpUtils.getRecommentVideo();
+                            videoAdapter.addVideo(video.getData());
+                            isLoadMore = false;
+                        }).start();
+                    }
                 }
             }
         });

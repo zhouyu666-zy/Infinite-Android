@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.bumptech.glide.Glide;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -28,8 +29,11 @@ import java.util.List;
 
 import edu.ace.infinite.R;
 import edu.ace.infinite.activity.BaseActivity;
+import edu.ace.infinite.application.Application;
 import edu.ace.infinite.pojo.Video;
 import edu.ace.infinite.utils.ConsoleUtils;
+import edu.ace.infinite.utils.videoCache.HttpProxyCacheServer;
+import edu.ace.infinite.view.CircleImage;
 
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder>{
     private final List<Video.Data> videoList;
@@ -45,16 +49,28 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder>{
     }
 
     public void addVideo(List<Video.Data> videos){
+        int size = videoList.size();
         videoList.addAll(videos);
+        activity.runOnUiThread(() -> notifyItemInserted(size));
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public VideoView videoView;
         public ExoMediaPlayer exoMediaPlayer;
         private boolean isPlay;
+        private TextView video_title;
+        private TextView author_nickname;
+        private CircleImage author_avatar;
+
+
 
         public ViewHolder(View view) {
             super(view);
+
+            author_nickname = view.findViewById(R.id.author_nickname);
+            video_title = view.findViewById(R.id.video_title);
+            author_avatar = view.findViewById(R.id.author_avatar);
+
             videoView = view.findViewById(R.id.videoView);
             exoMediaPlayer = new ExoMediaPlayer(view.getContext());
             exoMediaPlayer.setPlayWhenReady(false); // 加载完成不自动播放
@@ -112,8 +128,14 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder>{
         if(position == 0){
             holder.exoMediaPlayer.setPlayWhenReady(true);
         }
+
+        holder.author_nickname.setText("@"+video.getNickname());
+        holder.video_title.setText(video.getDesc());
+        Glide.with(activity).load(video.getAuthorAvatar()).into(holder.author_avatar);
         try {
-            ExoSourceBuilder exoSourceBuilder = new ExoSourceBuilder(holder.itemView.getContext(), video.getVideoSrc());
+            HttpProxyCacheServer proxy = Application.getProxy();
+            String proxyUrl = proxy.getProxyUrl(video.getVideoSrc(), video.getVideoId());
+            ExoSourceBuilder exoSourceBuilder = new ExoSourceBuilder(holder.itemView.getContext(), proxyUrl);
             exoSourceBuilder.setCacheEnable(false);
             MediaSource exoMediaSource = exoSourceBuilder.build();
             holder.exoMediaPlayer.setMediaSource(exoMediaSource);
