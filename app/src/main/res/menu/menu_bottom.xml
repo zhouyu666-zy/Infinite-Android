@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/item1"
+        android:title="推荐"
+        android:icon="@drawable/add_icon"
+        tools:ignore="HardcodedText,MenuTitle" />
+
+    <item
+        android:id="@+id/item2"
+        android:title="便签"
+        android:icon="@drawable/after_music_icon"
+        tools:ignore="HardcodedText,MenuTitle" />
+
+    <item
+        android:id="@+id/item3"
+        android:title="关于"
+        android:icon="@drawable/before_music_icon"
+        tools:ignore="HardcodedText,MenuTitle" />
+<!--    <item-->
+<!--        android:id="@+id/item0"-->
+<!--        android:title="提醒"-->
+<!--        android:icon="@drawable/remind_icon"-->
+<!--        tools:ignore="HardcodedText,MenuTitle" />-->
+
+<!--    <item-->
+<!--        android:id="@+id/item2"-->
+<!--        android:title="运动"-->
+<!--        android:icon="@drawable/exercise_icon"-->
+<!--        tools:ignore="HardcodedText,MenuTitle" />-->
+
+<!--    <item-->
+<!--        android:id="@+id/item4"-->
+<!--        android:title="睡眠"-->
+<!--        android:icon="@drawable/sleep_icon"-->
+<!--        tools:ignore="HardcodedText,MenuTitle" />-->
+</menu>

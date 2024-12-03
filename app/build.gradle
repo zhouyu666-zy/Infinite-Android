@@ -1,0 +1,58 @@
+plugins {
+    alias(libs.plugins.androidApplication)
+}
+
+android {
+    namespace 'edu.ace.infinite'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "edu.ace.infinite"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
+
+    //网络通信库
+    implementation "com.squareup.okhttp3:okhttp:4.9.0"
+    implementation 'com.github.JessYanCoding:AndroidAutoSize:v1.2.1'
+    implementation 'com.github.ibrahimsn98:SmoothBottomBar:1.7.6'
+
+    //图片加载缓存库
+//    implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation("com.github.bumptech.glide:glide:4.11.0") {
+        exclude group: "com.android.support"
+    }
+
+    //视频播放器
+    implementation 'org.salient.artvideoplayer:artplayer-core:1.1.0'
+    implementation "org.salient.artvideoplayer:artplayer-exo:1.1.0"
+
+    //Gson
+    implementation 'com.google.code.gson:gson:2.8.8'
+}

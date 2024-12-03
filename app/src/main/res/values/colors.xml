@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!--默认触摸反馈效果-->
+    <color name="selectableItemBackground">?android:selectableItemBackground</color>
+    <!--默认触摸反馈效果颜色-->
+    <color name="selectableItemBackgroundColor">#BABABA</color>
+<!--    <color name="t2color">#555555</color>-->
+<!--    <color name="t3color">#888888</color>-->
+
+    
+    <color name="Theme">#18A2FD</color>
+
+    <!--主要底部栏选中底色-->
+    <color name="mainBarIndicatorColor">#80E1DCDC</color>
+
+    <!--自定义-->
+    <!--    <color name="theme">#ffa726</color>-->
+    <color name="bg">#FFFFFF</color>
+    <color name="t1color">#222222</color>
+    <color name="t2color">#222222</color>
+    <color name="t3color">#555555</color>
+
+    <!--一般组件颜色-->
+    <color name="viewColor">#FFFFFF</color>
+
+    <!--一般Activity背景颜色-->
+    <color name="themeColor">#F8F8F8</color>
+    <!--    <color name="themeColor">#F8F9FD</color>-->
+    <!--    <color name="themeColor">#F7FCFF</color>-->
+
+    <!--音乐item默认图片背景颜色-->
+    <color name="music_default_back_color">#A9D5F6</color>
+
+    <!--分割线颜色-->
+    <color name="cutOffLine">#E6E5E5</color>
+
+
+    <!--深色字体颜色-->
+    <color name="textGeneral">#000000</color>
+
+
+    <!--浅色字体颜色-->
+    <color name="textTinge">#878787</color>
+
+    <color name="textTinge3">#555555</color>
+
+    <!--播放页默认背景-->
+    <color name="playPageBackground">#CFCCCC</color>
+
+    <color name="song_list_default_background">#C6C5C5</color>
+
+    <color name="textTinge2">#AEACAC</color>
+    <color name="item_move_color">#918F8F</color>
+
+    <color name="desktopLrcBack">#66000000</color>
+    <color name="desktopLrcColor1">#039EFB</color>
+    <color name="desktopLrcColor2">#F31404</color>
+    <color name="desktopLrcColor3">#43E496</color>
+    <color name="desktopLrcColor4">#FF5722</color>
+    <color name="desktopLrcColor5">#A850F0</color>
+    <color name="desktopLrcColor6">#FFEB3B</color>
+    <color name="myDialogLine">#E4E4E4</color>
+    <color name="video_theme">#ffffff</color>
+</resources>
