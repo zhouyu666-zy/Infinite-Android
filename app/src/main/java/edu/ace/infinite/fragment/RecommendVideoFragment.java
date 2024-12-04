@@ -139,8 +139,9 @@ public class RecommendVideoFragment extends BaseFragment {
     @Override
     public void onStart() {
         super.onStart();
-        if(exitIsPlay){
-            playVideo(currentPosition);
+        if(currViewHolder != null && exitIsPlay){
+            currViewHolder.videoView.start();
+//            playVideo(currentPosition);
         }
     }
     @Override
@@ -148,9 +149,10 @@ public class RecommendVideoFragment extends BaseFragment {
         super.onPause();
         if(currViewHolder != null){
             exitIsPlay = currViewHolder.isPlaying();
+            currViewHolder.videoView.pause();
 //            ConsoleUtils.logErr(exitIsPlay);
         }
-        pauseVideo(currentPosition);
+//        pauseVideo(currentPosition);
     }
 
 

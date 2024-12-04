@@ -83,6 +83,23 @@
             android:text="999"
             android:textSize="13sp"
             tools:ignore="HardcodedText" />
-
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/seekBar_parent"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:gravity="bottom"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:clipChildren="false">
+        <SeekBar
+            android:id="@+id/video_seekBar"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            style="@style/SeekBarStyle"
+            />
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
