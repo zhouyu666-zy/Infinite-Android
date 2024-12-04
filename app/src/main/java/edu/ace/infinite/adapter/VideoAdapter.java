@@ -72,12 +72,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Video.Data video = videoList.get(position);
+
         //如果为第一条视频，设置加载完成后自动播放
         if(position == 0){
             holder.exoMediaPlayer.setPlayWhenReady(true);
-            //预加载后面两条视频
-//            preloadVideo(position + 1);
-//            preloadVideo(position + 2);
             fragment.currViewHolder = holder;
         }
 
@@ -98,7 +96,6 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder>{
                     holder.reset();
                 }
                 holder.videoId = videoId;
-//                ConsoleUtils.logErr("load:"+videoId);
                 HttpProxyCacheServer proxy = Application.getProxy();
                 String videoSrc = video.getVideoSrc();
                 String proxyUrl = proxy.getProxyUrl(videoSrc, videoId);
@@ -118,7 +115,6 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder>{
 
     //预加载
     public void preloadVideo(int position){
-        ConsoleUtils.logErr(position);
         if(position < 0 || position >= videoList.size()) return;
         RecyclerView.ViewHolder viewHolder = findViewHolderForPosition(position);
         if(viewHolder instanceof ViewHolder){

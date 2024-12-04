@@ -12,14 +12,14 @@
         android:layout_height="match_parent"
         android:background="@color/themeColor"
         android:layout_marginBottom="50.5dp"
-        app:layout_constraintTop_toTopOf="@+id/view" />
+        app:layout_constraintTop_toTopOf="@+id/cutOffLineView" />
 
     <View
-        android:id="@+id/view"
+        android:id="@+id/cutOffLineView"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/cutOffLine"
+        android:background="@color/cutOffLine2"
         app:layout_constraintTop_toBottomOf="@+id/main_view_pager"/>
 
     <me.ibrahimsn.lib.SmoothBottomBar
@@ -27,17 +27,17 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        app:backgroundColor="@color/viewColor"
-        app:duration="250"
-        app:iconSize="30dp"
+        app:backgroundColor="#000000"
+        app:indicatorColor="@color/mainBarIndicatorColor2"
         app:iconTint="#B3AEAE"
         app:iconTintActive="@color/Theme"
-        app:indicatorColor="@color/mainBarIndicatorColor"
+        app:textColor="@color/Theme"
+        app:duration="250"
+        app:iconSize="30dp"
         app:indicatorRadius="30dp"
         app:itemPadding="6dp"
-        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintTop_toBottomOf="@+id/cutOffLineView"
         app:menu="@menu/menu_bottom"
-        app:textColor="@color/Theme"
         app:textSize="11dp"
         tools:ignore="SpUsage" />
 

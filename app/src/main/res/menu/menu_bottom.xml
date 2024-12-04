@@ -6,7 +6,7 @@
     <item
         android:id="@+id/item1"
         android:title="推荐"
-        android:icon="@drawable/hot"
+        android:icon="@drawable/hot_icon"
         tools:ignore="HardcodedText,MenuTitle" />
 
     <item

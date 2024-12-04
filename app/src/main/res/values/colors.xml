@@ -20,6 +20,7 @@
 
     <!--主要底部栏选中底色-->
     <color name="mainBarIndicatorColor">#80E1DCDC</color>
+    <color name="mainBarIndicatorColor2">#806A6A6A</color>
 
     <!--自定义-->
     <!--    <color name="theme">#ffa726</color>-->
@@ -41,6 +42,7 @@
 
     <!--分割线颜色-->
     <color name="cutOffLine">#E6E5E5</color>
+    <color name="cutOffLine2">#000000</color>
 
 
     <!--深色字体颜色-->
