@@ -6,19 +6,19 @@
     <item
         android:id="@+id/item1"
         android:title="推荐"
-        android:icon="@drawable/add_icon"
+        android:icon="@drawable/hot"
         tools:ignore="HardcodedText,MenuTitle" />
 
     <item
         android:id="@+id/item2"
-        android:title="便签"
-        android:icon="@drawable/after_music_icon"
+        android:title="消息"
+        android:icon="@drawable/message"
         tools:ignore="HardcodedText,MenuTitle" />
 
     <item
         android:id="@+id/item3"
-        android:title="关于"
-        android:icon="@drawable/before_music_icon"
+        android:title="我"
+        android:icon="@drawable/person"
         tools:ignore="HardcodedText,MenuTitle" />
 <!--    <item-->
 <!--        android:id="@+id/item0"-->
