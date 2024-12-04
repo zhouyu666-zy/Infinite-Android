@@ -27,7 +27,7 @@
             android:text="1@作者"
             android:textColor="@color/video_theme"
             android:textStyle="bold"
-            android:textSize="18sp"
+            android:textSize="17sp"
             tools:ignore="HardcodedText" />
         <TextView
             android:id="@+id/video_title"
@@ -35,7 +35,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/video_theme"
-            android:textSize="15sp"
+            android:textSize="14sp"
+            android:maxLines="3"
+            android:ellipsize="end"
             android:text="标题xxxxxxx"/>
     </LinearLayout>
 

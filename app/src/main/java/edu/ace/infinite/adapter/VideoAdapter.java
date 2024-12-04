@@ -3,6 +3,7 @@ package edu.ace.infinite.adapter;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
+import android.telephony.PhoneNumberUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+//import com.bumptech.glide.Glide;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.VideoDecoder;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -30,6 +33,7 @@ import java.util.List;
 import edu.ace.infinite.R;
 import edu.ace.infinite.activity.BaseActivity;
 import edu.ace.infinite.application.Application;
+import edu.ace.infinite.fragment.RecommendVideoFragment;
 import edu.ace.infinite.pojo.Video;
 import edu.ace.infinite.utils.ConsoleUtils;
 import edu.ace.infinite.utils.videoCache.HttpProxyCacheServer;
@@ -38,10 +42,12 @@ import edu.ace.infinite.view.CircleImage;
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder>{
     private final List<Video.Data> videoList;
     private BaseActivity activity;
+    private RecommendVideoFragment fragment;
 
-    public VideoAdapter(List<Video.Data> diaryList, BaseActivity activity) {
+    public VideoAdapter(List<Video.Data> diaryList, BaseActivity activity,RecommendVideoFragment fragment) {
         this.videoList = diaryList;
         this.activity = activity;
+        this.fragment = fragment;
     }
 
     public List<Video.Data> getVideoList() {
@@ -54,6 +60,87 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder>{
         activity.runOnUiThread(() -> notifyItemInserted(size));
     }
 
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_video, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Video.Data video = videoList.get(position);
+        //如果为第一条视频，设置加载完成后自动播放
+        if(position == 0){
+            holder.exoMediaPlayer.setPlayWhenReady(true);
+            //预加载后面两条视频
+//            preloadVideo(position + 1);
+//            preloadVideo(position + 2);
+            fragment.currViewHolder = holder;
+        }
+
+        holder.author_nickname.setText("@"+video.getNickname());
+        holder.video_title.setText(video.getDesc());
+        Glide.with(activity).load(video.getAuthorAvatar()).into(holder.author_avatar);
+
+        loadVideo(holder,video);
+    }
+
+    //加载视频
+    private void loadVideo(ViewHolder holder, Video.Data video) {
+        try {
+            String videoId = video.getVideoId();
+            //不是同一视频执行加载
+            if(!holder.videoId.equals(videoId) || !holder.isInitializeComplete){
+                if(!holder.videoId.equals("null")){
+                    holder.reset();
+                }
+                holder.videoId = videoId;
+//                ConsoleUtils.logErr("load:"+videoId);
+                HttpProxyCacheServer proxy = Application.getProxy();
+                String videoSrc = video.getVideoSrc();
+                String proxyUrl = proxy.getProxyUrl(videoSrc, videoId);
+                ExoSourceBuilder exoSourceBuilder = new ExoSourceBuilder(holder.itemView.getContext(), proxyUrl);
+                exoSourceBuilder.setCacheEnable(false);
+                MediaSource exoMediaSource = exoSourceBuilder.build();
+                holder.exoMediaPlayer.setMediaSource(exoMediaSource);
+                if(holder.videoView != null){
+                    holder.videoView.prepare();
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    //预加载
+    public void preloadVideo(int position){
+        ConsoleUtils.logErr(position);
+        if(position < 0 || position >= videoList.size()) return;
+        RecyclerView.ViewHolder viewHolder = findViewHolderForPosition(position);
+        if(viewHolder instanceof ViewHolder){
+            ViewHolder holder = (ViewHolder) viewHolder;
+            Video.Data video = videoList.get(position);
+            loadVideo(holder,video);
+        }
+    }
+
+
+
+    private RecyclerView.ViewHolder findViewHolderForPosition(int position){
+        return fragment.videoRecyclerView.findViewHolderForAdapterPosition(position);
+    }
+
+
+
+    @Override
+    public int getItemCount() {
+        return videoList.size();
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public VideoView videoView;
         public ExoMediaPlayer exoMediaPlayer;
@@ -62,7 +149,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder>{
         private TextView author_nickname;
         private CircleImage author_avatar;
 
+        public boolean isInitializeComplete = false;
+        private String videoId = "null";
 
+        private int loadTime = 0;
 
         public ViewHolder(View view) {
             super(view);
@@ -75,7 +165,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder>{
             exoMediaPlayer = new ExoMediaPlayer(view.getContext());
             exoMediaPlayer.setPlayWhenReady(false); // 加载完成不自动播放
             videoView.setMediaPlayer(exoMediaPlayer);
-
+            exoMediaPlayer.setLooping(true);
             exoMediaPlayer.getImpl().addListener(new Player.EventListener() {
                 @Override
                 public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
@@ -84,6 +174,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder>{
                             // 播放器缓冲中
                             break;
                         case Player.STATE_READY:
+                            isInitializeComplete = true;
                             if(isPlay){
                                 videoView.start();
                             }
@@ -102,6 +193,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder>{
             });
         }
 
+        public boolean isPlaying(){
+            return exoMediaPlayer.isPlaying();
+        }
+
         public void playVideo() {
             isPlay = true;
             videoView.start();
@@ -111,47 +206,12 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder>{
             isPlay = false;
             videoView.pause();
         }
-    }
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_video, parent, false);
-        return new ViewHolder(view);
-    }
-
-    @SuppressLint("SetTextI18n")
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Video.Data video = videoList.get(position);
-        //如果为第一条视频，设置加载完成后自动播放
-        if(position == 0){
-            holder.exoMediaPlayer.setPlayWhenReady(true);
+        public void reset() {
+            isPlay = false;
+            isInitializeComplete = false;
+            exoMediaPlayer.reset();
         }
-
-        holder.author_nickname.setText("@"+video.getNickname());
-        holder.video_title.setText(video.getDesc());
-        Glide.with(activity).load(video.getAuthorAvatar()).into(holder.author_avatar);
-        try {
-            HttpProxyCacheServer proxy = Application.getProxy();
-            String proxyUrl = proxy.getProxyUrl(video.getVideoSrc(), video.getVideoId());
-            ExoSourceBuilder exoSourceBuilder = new ExoSourceBuilder(holder.itemView.getContext(), proxyUrl);
-            exoSourceBuilder.setCacheEnable(false);
-            MediaSource exoMediaSource = exoSourceBuilder.build();
-            holder.exoMediaPlayer.setMediaSource(exoMediaSource);
-            holder.exoMediaPlayer.setLooping(true);
-            if(holder.videoView != null){
-                holder.videoView.prepare();
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-
-    @Override
-    public int getItemCount() {
-        return videoList.size();
     }
 
 

@@ -29,8 +29,7 @@ import edu.ace.infinite.view.video.PageLayoutManager;
 public class RecommendVideoFragment extends BaseFragment {
     private BaseActivity activity;
     private VideoAdapter videoAdapter;
-    private RecyclerView videoRecyclerView;
-    private LinearSnapHelper snapHelper;
+    public RecyclerView videoRecyclerView;
 
     public RecommendVideoFragment(BaseActivity activity){
         this.activity = activity;
@@ -45,13 +44,6 @@ public class RecommendVideoFragment extends BaseFragment {
 
 
     @SuppressLint("SetTextI18n")
-    @Override
-    public void onStart() {
-        super.onStart();
-
-    }
-
-    @SuppressLint("SetTextI18n")
     private void initView() {
         new Thread(() -> {
             Video video = VideoHttpUtils.getRecommentVideo();
@@ -59,7 +51,7 @@ public class RecommendVideoFragment extends BaseFragment {
                 if(video != null){
                     initVideoRecyclerView(video.getData());
                 }else {
-                    activity.showToast("出错了");
+                    activity.showToast("网络请求失败");
                 }
             });
         }).start();
@@ -67,26 +59,34 @@ public class RecommendVideoFragment extends BaseFragment {
 
     private void initVideoRecyclerView(List<Video.Data> videoList) {
         videoRecyclerView = findViewById(R.id.videoRecyclerView);
-        videoRecyclerView.setItemViewCacheSize(0); //保留几条视频的播放信息
+        //设置为0，可以保证同时只有3条视频在加载
+        videoRecyclerView.setItemViewCacheSize(0); //一级缓存，设置item复用数量
 
         PageLayoutManager pageLayoutManager = new PageLayoutManager(activity, OrientationHelper.VERTICAL, false);
         videoRecyclerView.setLayoutManager(pageLayoutManager);
-        videoAdapter = new VideoAdapter(videoList,activity);
+        videoAdapter = new VideoAdapter(videoList, activity, this);
         videoRecyclerView.setAdapter(videoAdapter);
 
+        //设置滑动后选中和释放的监听
         pageLayoutManager.setOnViewPagerListener(new OnViewPagerListener() {
             @Override
             public void onPageRelease(boolean isNext, int position) {
-                ConsoleUtils.logErr(TAG, "释放位置:" + position);
+//                ConsoleUtils.logErr(TAG, "释放位置:" + position);
                 pauseVideo(position);
+                // 调用预加载方法
+                if(isNext){
+                    preloadVideos(true,position+1);
+                }else {
+                    preloadVideos(false,position-1);
+                }
             }
 
             private boolean isLoadMore = false;
             @Override
             public void onPageSelected(int position, boolean isBottom) {
-                ConsoleUtils.logErr(TAG, "选择位置:" + position + "，是否为底部:" + isBottom);
+//                ConsoleUtils.logErr(TAG, "选中位置：" + position+",是否为底部："+isBottom);
+                currentPosition = position;
                 playVideo(position);
-
                 if(isBottom){
                     if(!isLoadMore){
                         //视频为底部时，加载更多视频
@@ -102,13 +102,27 @@ public class RecommendVideoFragment extends BaseFragment {
         });
     }
 
+    private void preloadVideos(boolean isNext,int currentPosition) {
+        int preloadPosition;
+        if(isNext){  //如果切换到下一个视频，则预加载当前页面的下一条
+            preloadPosition = currentPosition + 1;
+        }else {  //如果是切换到上一个视频，则加载当前页面的上一条
+            preloadPosition = currentPosition - 1;
+        }
+        if (preloadPosition >= 0 && preloadPosition < videoAdapter.getItemCount()) {
+            videoAdapter.preloadVideo(preloadPosition);
+        }
+    }
 
+    private int currentPosition = 0;
+    public VideoAdapter.ViewHolder currViewHolder;
     private void playVideo(int position) {
         if (videoRecyclerView == null) return;
         RecyclerView.ViewHolder viewHolder = videoRecyclerView.findViewHolderForAdapterPosition(position);
         if (viewHolder instanceof VideoAdapter.ViewHolder) {
             VideoAdapter.ViewHolder videoViewHolder = (VideoAdapter.ViewHolder) viewHolder;
             videoViewHolder.playVideo();
+            currViewHolder = videoViewHolder;
         }
     }
     private void pauseVideo(int position) {
@@ -119,6 +133,26 @@ public class RecommendVideoFragment extends BaseFragment {
             videoViewHolder.pauseVideo();
         }
     }
+
+    private boolean exitIsPlay;
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void onStart() {
+        super.onStart();
+        if(exitIsPlay){
+            playVideo(currentPosition);
+        }
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(currViewHolder != null){
+            exitIsPlay = currViewHolder.isPlaying();
+//            ConsoleUtils.logErr(exitIsPlay);
+        }
+        pauseVideo(currentPosition);
+    }
+
 
     @Override
     public void onDestroyView() {
