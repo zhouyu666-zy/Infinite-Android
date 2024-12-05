@@ -6,6 +6,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Handler;
 import android.telephony.PhoneNumberUtils;
+import android.util.EventLog;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -47,6 +48,8 @@ import edu.ace.infinite.pojo.Video;
 import edu.ace.infinite.utils.ConsoleUtils;
 import edu.ace.infinite.utils.videoCache.HttpProxyCacheServer;
 import edu.ace.infinite.view.CircleImage;
+import edu.ace.infinite.view.EventUtils;
+import edu.ace.infinite.view.LoveView;
 
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> {
     private final List<Video.Data> videoList;
@@ -156,7 +159,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         private CircleImage author_avatar;
         private SeekBar video_seekBar;
         private View seekBarParent;
-
+        private LoveView loveView;
         public boolean isInitializeComplete = false;
         private String videoId = "null";
 
@@ -179,6 +182,9 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
             video_seekBar = view.findViewById(R.id.video_seekBar);
             seekBarParent = view.findViewById(R.id.seekBar_parent);
             video_seekBar.setMax(seekBarMax);
+
+            loveView = view.findViewById(R.id.loveView);
+
             videoView = view.findViewById(R.id.videoView);
             exoMediaPlayer = new ExoMediaPlayer(view.getContext());
             exoMediaPlayer.setPlayWhenReady(false); // 加载完成不自动播放
@@ -271,65 +277,47 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         }
 
         private void setupGestureListeners(View view) {
-            GestureDetector gestureDetector = new GestureDetector(view.getContext(), new GestureDetector.SimpleOnGestureListener() {
+            view.setOnTouchListener(new EventUtils.OnDoubleClickListener(new EventUtils.OnDoubleClickListener.DoubleClickCallback() {
                 @Override
-                public boolean onDoubleTap(MotionEvent e) {
-                    handleDoubleTap();
+                public void onDoubleClick(MotionEvent event) {
+                    handleDoubleTap(event);
                     isDoubleTap = true; // 标记为双击
-                    return true;
                 }
 
                 @Override
-                public void onLongPress(MotionEvent e) {
-                    super.onLongPress(e);
-                    ConsoleUtils.logErr("长按开始");
-                    // 长按开始逻辑，例如加速播放
-                    isLongPressActive = true;
-                    setPlaySpeed(3.0f);
-                }
-
-                @Override
-                public boolean onSingleTapConfirmed(MotionEvent e) {
-                    if (isDoubleTap) {
-                        // 如果是双击，忽略单击事件
-                        isDoubleTap = false;
-                        return true;
+                public void onClick(MotionEvent event) {
+                    if (isLongPressActive) {
+                        // 长按结束逻辑，例如恢复正常播放速度
+                        setPlaySpeed(1.0f);
+                        isLongPressActive = false;
+                        return;
                     }
-
                     // 单击事件逻辑，切换播放/暂停
                     if (isPlaying()) {
                         pauseVideo();
                     } else {
                         playVideo();
                     }
-                    return true;
                 }
-            });
 
-            view.setOnTouchListener(new View.OnTouchListener() {
-                @SuppressLint("ClickableViewAccessibility")
                 @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    gestureDetector.onTouchEvent(event);
-                    // 检测长按结束
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_UP:
-                        case MotionEvent.ACTION_CANCEL:
-                            if (isLongPressActive) {
-                                ConsoleUtils.logErr("长按结束");
-                                // 长按结束逻辑，例如恢复正常播放速度
-                                setPlaySpeed(1.0f);
-                                isLongPressActive = false;
-                            }
-                            break;
-                    }
-                    return true;
+                public void onLongPress(MotionEvent event) {
+                    ConsoleUtils.logErr("长按开始");
+                    // 长按开始逻辑，例如加速播放
+                    setPlaySpeed(3.0f);
                 }
-            });
+
+                @Override
+                public void onLongPressFinish(MotionEvent event) {
+                    // 长按结束逻辑，例如恢复正常播放速度
+                    setPlaySpeed(1.0f);
+                }
+            }, itemView.getContext()));
         }
 
         // 双击事件处理方法
-        private void handleDoubleTap() {
+        private void handleDoubleTap(MotionEvent event) {
+            loveView.addLoveView(event);
             ConsoleUtils.logErr("双击" + System.currentTimeMillis());
         }
 

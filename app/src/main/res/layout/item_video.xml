@@ -5,10 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!--视频组件-->
     <org.salient.artplayer.ui.VideoView
         android:id="@+id/videoView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <!--双击红心-->
+    <edu.ace.infinite.view.LoveView
+        android:id="@+id/loveView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 <!--    <TextureView-->
 <!--        android:id="@+id/videoView"-->
