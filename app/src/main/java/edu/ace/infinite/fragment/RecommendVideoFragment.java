@@ -117,14 +117,12 @@ public class RecommendVideoFragment extends BaseFragment {
     }
 
     private int currentPosition = 0;
-    public VideoAdapter.ViewHolder currViewHolder;
     private void playVideo(int position) {
         if (videoRecyclerView == null) return;
         RecyclerView.ViewHolder viewHolder = videoRecyclerView.findViewHolderForAdapterPosition(position);
         if (viewHolder instanceof VideoAdapter.ViewHolder) {
             VideoAdapter.ViewHolder videoViewHolder = (VideoAdapter.ViewHolder) viewHolder;
             videoViewHolder.playVideo();
-            currViewHolder = videoViewHolder;
         }
     }
     private void pauseVideo(int position) {
@@ -141,17 +139,17 @@ public class RecommendVideoFragment extends BaseFragment {
     @Override
     public void onStart() {
         super.onStart();
-        if(currViewHolder != null && exitIsPlay){
-            currViewHolder.videoView.start();
+        if(VideoAdapter.currPlayViewHolder != null && exitIsPlay){
+            VideoAdapter.currPlayViewHolder.playVideo();
 //            playVideo(currentPosition);
         }
     }
     @Override
     public void onPause() {
         super.onPause();
-        if(currViewHolder != null){
-            exitIsPlay = currViewHolder.isPlaying();
-            currViewHolder.videoView.pause();
+        if(VideoAdapter.currPlayViewHolder != null){
+            exitIsPlay = VideoAdapter.currPlayViewHolder.isPlaying();
+            VideoAdapter.currPlayViewHolder.pauseVideo();
 //            ConsoleUtils.logErr(exitIsPlay);
         }
 //        pauseVideo(currentPosition);
@@ -160,12 +158,14 @@ public class RecommendVideoFragment extends BaseFragment {
 
     @Override
     public void onDestroyView() {
+        VideoAdapter.currPlayViewHolder = null;
         super.onDestroyView();
         view = null;
     }
 
     @Override
     public void onDestroy() {
+        VideoAdapter.currPlayViewHolder = null;
         super.onDestroy();
         if(view != null){
             view = null;
