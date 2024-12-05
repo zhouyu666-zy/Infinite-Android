@@ -93,7 +93,9 @@ public class RecommendVideoFragment extends BaseFragment {
                         new Thread(() -> {
                             isLoadMore = true;
                             Video video = VideoHttpUtils.getRecommentVideo();
-                            videoAdapter.addVideo(video.getData());
+                            if(video != null){
+                                videoAdapter.addVideo(video.getData());
+                            }
                             isLoadMore = false;
                         }).start();
                     }

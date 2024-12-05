@@ -41,12 +41,13 @@ public class VideoHttpUtils {
             Video video = new Gson().fromJson(result, Video.class);
             // 假设 Video.Data 是一个类，video.getData() 返回一个 List<Video.Data>
             List<Video.Data> dataList = video.getData();
-            //移除空元素
+            //移除空对象
             dataList.removeIf(Objects::isNull);
             return video;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+        return null;
     }
 
     public static MediaSource getMediaVideoSource(Context context, String src){
