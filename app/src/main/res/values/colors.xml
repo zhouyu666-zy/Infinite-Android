@@ -71,4 +71,6 @@
     <color name="desktopLrcColor6">#FFEB3B</color>
     <color name="myDialogLine">#E4E4E4</color>
     <color name="video_theme">#ffffff</color>
+    <color name="colorPrimary">#6200EE</color> <!-- 默认背景颜色 -->
+    <color name="colorAccent">#FF4081</color> <!-- 聚焦时的背景颜色 -->
 </resources>
