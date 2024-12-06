@@ -6,6 +6,7 @@ import android.media.MediaPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.gson.Gson;
 
+import org.json.JSONObject;
 import org.salient.artplayer.exo.ExoSourceBuilder;
 
 import java.io.IOException;
@@ -28,8 +29,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class VideoHttpUtils {
-//    public final static String IP = "http://192.168.97.202:8181";
-    public final static String IP = "http://192.168.64.126:8181";
+    public final static String IP = "http://192.168.97.202:8181";
+//    public final static String IP = "http://192.168.64.126:8181";
     public static OkHttpClient client = new OkHttpClient()
             .newBuilder().connectTimeout(5000, TimeUnit.MILLISECONDS)
             .followRedirects(true) // 默认为 true
@@ -57,20 +58,34 @@ public class VideoHttpUtils {
         return null;
     }
 
-    public static void likeVideo(boolean isLike,Video.Data video){
-        Like like = new Like("1",video,isLike);
+    /**
+     * 喜欢/不喜欢视频
+     */
+    public static boolean likeVideo(boolean isLike,Video.Data video){
+        String userId = "1";
+        Like like = new Like(userId, video, isLike);
         String json = new Gson().toJson(like);
-        ConsoleUtils.logErr(json);
+        String url = IP;
+        if(isLike){
+            url += "/api/video/like";
+        }else {
+
+            url += "/api/video/dislike";
+        }
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json);
-        Request request = new Request.Builder().url(IP + "/api/video/like")
+        Request request = new Request.Builder().url(url)
                 .post(requestBody)
                 .build();
         try {
             String result = client.newCall(request).execute().body().string();
             ConsoleUtils.logErr(result);
-        } catch (IOException e) {
+            JSONObject jsonObject = new JSONObject(result);
+            int code = jsonObject.getInt("code");
+            return code == 200;
+        } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
 

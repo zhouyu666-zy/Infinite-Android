@@ -2,6 +2,7 @@ package edu.ace.infinite.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Handler;
@@ -51,6 +52,7 @@ import edu.ace.infinite.utils.videoCache.HttpProxyCacheServer;
 import edu.ace.infinite.view.CircleImage;
 import edu.ace.infinite.view.EventUtils;
 import edu.ace.infinite.view.LoveView;
+import edu.ace.infinite.view.MyToast;
 
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> {
     private final List<Video.Data> videoList;
@@ -121,6 +123,36 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         holder.video_title.setText(video.getDesc());
         Glide.with(activity).load(video.getAuthorAvatar()).into(holder.author_avatar);
 
+        if(video.isLike()){
+            holder.like_btn.setImageTintList(null);
+        }else {
+            holder.like_btn.setImageTintList(holder.itemView.getContext().getColorStateList(R.color.white));
+        }
+        holder.like_btn.setOnClickListener(view -> {
+            if(video.isLike()){
+                holder.like_btn.setImageTintList(holder.itemView.getContext().getColorStateList(R.color.white));
+                video.setLike(false);
+                new Thread(() -> {
+                    if(VideoHttpUtils.likeVideo(false,video)){
+                        video.setLike(false);
+                    }else {
+                        video.setLike(true);
+                        holder.itemView.post(() -> MyToast.show("取消点赞失败"));
+                    }
+                }).start();
+            }else {
+                holder.like_btn.setImageTintList(null);
+                video.setLike(true);
+                new Thread(() -> {
+                    if(VideoHttpUtils.likeVideo(true,video)){
+                        video.setLike(true);
+                    }else {
+                        video.setLike(false);
+                        holder.itemView.post(() -> MyToast.show("点赞失败"));
+                    }
+                }).start();
+            }
+        });
         loadVideo(holder, video);
     }
 
@@ -188,6 +220,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         private View seekBarParent;
         private LoveView loveView;
         private ImageView video_play_image;
+        private ImageView like_btn;
+        private ImageView comment_btn;
         public boolean isInitializeComplete = false;
         private String videoId = "null";
         // 进度条是否在拖动
@@ -203,6 +237,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
             video_seekBar = view.findViewById(R.id.video_seekBar);
             seekBarParent = view.findViewById(R.id.seekBar_parent);
             video_play_image = view.findViewById(R.id.video_play_image);
+            like_btn = view.findViewById(R.id.like_btn);
+            comment_btn = view.findViewById(R.id.comment_btn);
             video_seekBar.setMax(seekBarMax);
 
             loveView = view.findViewById(R.id.loveView);
@@ -350,9 +386,18 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         private void handleDoubleTap(MotionEvent event) {
             loveView.addLoveView(event);
             ConsoleUtils.logErr("双击" + System.currentTimeMillis());
-            new Thread(() -> {
-                VideoHttpUtils.likeVideo(true,video);
-            }).start();
+            if(!video.isLike()){
+                video.setLike(true);
+                like_btn.setImageTintList(null);
+                new Thread(() -> {
+                    if(VideoHttpUtils.likeVideo(true,video)){
+                        video.setLike(true);
+                    }else {
+                        video.setLike(false);
+                        itemView.post(() -> MyToast.show("点赞失败"));
+                    }
+                }).start();
+            }
         }
 
         public boolean isPlaying() {

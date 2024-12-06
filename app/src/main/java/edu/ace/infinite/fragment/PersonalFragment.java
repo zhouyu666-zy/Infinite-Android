@@ -30,6 +30,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import edu.ace.infinite.R;
 import edu.ace.infinite.adapter.PersonalPagerAdapter;
+import edu.ace.infinite.utils.ConsoleUtils;
 import edu.ace.infinite.utils.PhoneMessage;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
@@ -84,7 +85,6 @@ public class PersonalFragment extends BaseFragment {
         appBarLayout.setExpanded(true, false);
 
         setupBackgroundEffect();
-
         return view;
     }
 
@@ -92,11 +92,9 @@ public class PersonalFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // 设置透明状态栏
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            requireActivity().getWindow().setStatusBarColor(Color.TRANSPARENT);
-            requireActivity().getWindow().getDecorView().setSystemUiVisibility(
+        requireActivity().getWindow().setStatusBarColor(Color.TRANSPARENT);
+        requireActivity().getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        }
         // 获取状态栏高度
         int statusBarHeight = PhoneMessage.getStatusBarHeight(getContext());
 
@@ -143,16 +141,13 @@ public class PersonalFragment extends BaseFragment {
             if (updateBackgroundRunnable != null) {
                 handler.removeCallbacks(updateBackgroundRunnable);
             }
-            updateBackgroundRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    if (scrollProgress > 0.1f) {
-                        blurredBuilder.into(backgroundImage);
-                    } else {
-                        Glide.with(PersonalFragment.this)
-                                .load(R.drawable.user_background)
-                                .into(backgroundImage);
-                    }
+            updateBackgroundRunnable = () -> {
+                if (scrollProgress > 0.1f) {
+                    blurredBuilder.into(backgroundImage);
+                } else {
+                    Glide.with(PersonalFragment.this)
+                            .load(R.drawable.user_background)
+                            .into(backgroundImage);
                 }
             };
             handler.postDelayed(updateBackgroundRunnable, DEBOUNCE_DELAY);

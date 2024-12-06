@@ -74,6 +74,7 @@
             android:src="@drawable/default_avatar_image"/>
 
         <ImageView
+            android:id="@+id/like_btn"
             android:layout_marginTop="@dimen/video_right_btn_space"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -89,6 +90,7 @@
             tools:ignore="HardcodedText" />
 
         <ImageView
+            android:id="@+id/comment_btn"
             android:layout_marginTop="@dimen/video_right_btn_space"
             android:layout_width="40dp"
             android:layout_height="40dp"

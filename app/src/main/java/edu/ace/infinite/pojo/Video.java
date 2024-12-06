@@ -41,6 +41,7 @@ public class Video {
         private String videoId;
         private String videoSrc;
         private String type;
+        private boolean like;
 
         public String getAuthorAvatar() {
             return authorAvatar;
@@ -112,6 +113,14 @@ public class Video {
 
         public void setType(String type) {
             this.type = type;
+        }
+
+        public boolean isLike() {
+            return like;
+        }
+
+        public void setLike(boolean like) {
+            this.like = like;
         }
     }
 }
