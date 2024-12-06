@@ -194,10 +194,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
                             break;
                         case Player.STATE_READY:
                             //如果已经调用播放方法，则直接播放
+                            isInitializeComplete = true;
                             if (isPlay) {
                                 playVideo();
                             }
-                            isInitializeComplete = true;
                             break;
                         case Player.STATE_ENDED:
                             // 播放结束

@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ace.infinite.R;
+import edu.ace.infinite.adapter.VideoAdapter;
+import edu.ace.infinite.fragment.MessageFragment;
 import edu.ace.infinite.fragment.PersonalFragment;
 import edu.ace.infinite.fragment.RecommendVideoFragment;
 import edu.ace.infinite.view.CustomViewPager;
@@ -41,10 +43,9 @@ public class MainActivity extends BaseActivity {
         view_pager = findViewById(R.id.main_view_pager);
 
         fragmentList = new ArrayList<>();
-        fragmentList.add(new RecommendVideoFragment(this));
-//        fragmentList.add(new RecommendVideoFragment(this));
-//        fragmentList.add(new RecommendVideoFragment(this));
-        fragmentList.add(new PersonalFragment());
+        RecommendVideoFragment recommendVideoFragment = new RecommendVideoFragment(this);
+        fragmentList.add(recommendVideoFragment);
+        fragmentList.add(new MessageFragment());
         fragmentList.add(new PersonalFragment());
 
         //设置预加载页数
@@ -70,6 +71,11 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onPageSelected(int position) {
                 changePage(position);
+                if(position != 0){
+                    if(VideoAdapter.currPlayViewHolder.isPlaying()){
+                        VideoAdapter.currPlayViewHolder.pauseVideo();
+                    }
+                }
             }
 
             @Override
