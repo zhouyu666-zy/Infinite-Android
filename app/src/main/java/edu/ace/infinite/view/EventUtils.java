@@ -75,19 +75,21 @@ public class EventUtils {
                     return true;
                 }
                 firstClick = true;
-                handler.removeCallbacksAndMessages(null);
-                handler.postDelayed(() -> {
-                    if (mCallback != null) {
-                        if(!isLongPress){
-                            mCallback.onClick(event);
-                        }else {
-                            isLongPress = false;
-                            mCallback.onLongPressFinish(event);
-                        }
-                    }
+
+                if(isLongPress){
+                    mCallback.onLongPressFinish(event);
+                    isLongPress = false;
                     firstClick = false;
+                }else {
                     handler.removeCallbacksAndMessages(null);
-                },totalTime);
+                    handler.postDelayed(() -> {
+                        if (mCallback != null) {
+                            mCallback.onClick(event);
+                        }
+                        firstClick = false;
+                        handler.removeCallbacksAndMessages(null);
+                    },totalTime);
+                }
             }
             return mCallback.onTouch(v,event);
         }
@@ -104,7 +106,7 @@ public class EventUtils {
             void onDoubleClick(MotionEvent event);
             void onClick();
             void onLongPress();
-            void longPressFinish();
+            void onLongPressFinish();
 
             default void longPressFinishLeft() {
 
@@ -372,7 +374,7 @@ public class EventUtils {
             }else {
                 mEventCallback.longPressFinishRight();
             }
-            mEventCallback.longPressFinish();
+            mEventCallback.onLongPressFinish();
         }
     }
 }

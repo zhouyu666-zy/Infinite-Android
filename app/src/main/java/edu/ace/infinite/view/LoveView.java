@@ -47,11 +47,13 @@ public class LoveView extends RelativeLayout {
 
     public void addLoveView(MotionEvent event){
         ImageView imageView = new ImageView(mContext);
+        int size = PhoneMessage.dpToPx(120);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                PhoneMessage.dpToPx(120), PhoneMessage.dpToPx(120)); //爱心高宽
+                size, size); //爱心高宽
+        int offset = PhoneMessage.dpToPx(10);
         //根据点击位置确定爱心显示位置
-        params.leftMargin = (int) event.getX() - PhoneMessage.dpToPx(90);
-        params.topMargin = (int) event.getY() - PhoneMessage.dpToPx(90);
+        params.leftMargin = (int) event.getX() - (size / 2 + offset);
+        params.topMargin = (int) event.getY() - (size + offset);
         imageView.setImageResource(R.drawable.like_icon_y);
         imageView.setLayoutParams(params);
         addView(imageView);
@@ -63,10 +65,10 @@ public class LoveView extends RelativeLayout {
                 .with(alpha(imageView, 0, 1, 100, 0))
                 .with(scale(imageView, "scaleX", 0.9f, 1, 50, 150))
                 .with(scale(imageView, "scaleY", 0.9f, 1, 50, 150))
-                .with(translationY(imageView, 0, -1200, 800, 400))
+                .with(translationY(imageView, 0, -1200, 1000, 400))
                 .with(alpha(imageView, 1, 0, 300, 400))
-                .with(scale(imageView, "scaleX", 1, 3f, 700, 400))
-                .with(scale(imageView, "scaleY", 1, 3f, 700, 400));
+                .with(scale(imageView, "scaleX", 1, 2f, 700, 400))
+                .with(scale(imageView, "scaleY", 1, 2f, 700, 400));
         animatorSet.start();
         animatorSet.addListener(new AnimatorListenerAdapter() {
             @Override

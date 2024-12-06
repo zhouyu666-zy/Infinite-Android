@@ -162,14 +162,6 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         private LoveView loveView;
         public boolean isInitializeComplete = false;
         private String videoId = "null";
-
-        private int loadTime = 0;
-
-        // 用于跟踪是否处于长按状态
-        private boolean isLongPressActive = false;
-
-        // 用于防止双击后立即触发单击
-        private boolean isDoubleTap = false;
         // 进度条是否在拖动
         private boolean isSeekBarTouch = false;
         private final int seekBarMax = 1000;
@@ -281,17 +273,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
                 @Override
                 public void onDoubleClick(MotionEvent event) {
                     handleDoubleTap(event);
-                    isDoubleTap = true; // 标记为双击
                 }
 
                 @Override
                 public void onClick(MotionEvent event) {
-                    if (isLongPressActive) {
-                        // 长按结束逻辑，例如恢复正常播放速度
-                        setPlaySpeed(1.0f);
-                        isLongPressActive = false;
-                        return;
-                    }
                     // 单击事件逻辑，切换播放/暂停
                     if (isPlaying()) {
                         pauseVideo();
