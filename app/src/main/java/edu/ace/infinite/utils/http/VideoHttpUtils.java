@@ -51,7 +51,7 @@ public class VideoHttpUtils {
             //移除空对象
             dataList.removeIf(Objects::isNull);
             return video;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

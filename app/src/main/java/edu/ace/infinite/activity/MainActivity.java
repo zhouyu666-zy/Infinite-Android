@@ -70,17 +70,23 @@ public class MainActivity extends BaseActivity {
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
             @Override
             public void onPageSelected(int position) {
-
                 changePage(position);
-                if(position != 0){
-                    if(VideoAdapter.currPlayViewHolder != null && VideoAdapter.currPlayViewHolder.isPlaying()){
-                        VideoAdapter.currPlayViewHolder.pauseVideo();
-                        isPauseVideo = true;
-                    }
-                }else {
-                    if(isPauseVideo){
-                        VideoAdapter.currPlayViewHolder.playVideo();
-                        isPauseVideo = false;
+                if(VideoAdapter.currPlayViewHolder != null ){
+                    if(position != 0){
+                        if(VideoAdapter.currPlayViewHolder.isInitializeComplete){
+                            if(VideoAdapter.currPlayViewHolder.isPlaying()){
+                                VideoAdapter.currPlayViewHolder.pauseVideo();
+                                isPauseVideo = true;
+                            }
+                        }else {
+                            VideoAdapter.currPlayViewHolder.pauseVideo();
+                            isPauseVideo = true;
+                        }
+                    }else {
+                        if(isPauseVideo){
+                            VideoAdapter.currPlayViewHolder.playVideo();
+                            isPauseVideo = false;
+                        }
                     }
                 }
             }

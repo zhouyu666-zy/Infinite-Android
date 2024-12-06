@@ -30,6 +30,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import edu.ace.infinite.R;
 import edu.ace.infinite.adapter.PersonalPagerAdapter;
+import edu.ace.infinite.utils.PhoneMessage;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class PersonalFragment extends BaseFragment {
@@ -97,11 +98,7 @@ public class PersonalFragment extends BaseFragment {
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         }
         // 获取状态栏高度
-        int statusBarHeight = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            statusBarHeight = getResources().getDimensionPixelSize(resourceId);
-        }
+        int statusBarHeight = PhoneMessage.getStatusBarHeight(getContext());
 
         // 调整用户信息 ConstraintLayout 的顶部边距
         View userInfoLayout = view.findViewById(R.id.user_info_layout); // 确保给 ConstraintLayout 设置了 id
@@ -113,14 +110,11 @@ public class PersonalFragment extends BaseFragment {
         AppBarLayout appBarLayout = view.findViewById(R.id.appbar);
         ImageView backgroundImage = view.findViewById(R.id.background_image);
 
-        appBarLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                int appBarHeight = appBarLayout.getHeight();
-                ViewGroup.LayoutParams imageParams = backgroundImage.getLayoutParams();
-                imageParams.height = appBarHeight;
-                backgroundImage.setLayoutParams(imageParams);
-            }
+        appBarLayout.post(() -> {
+            int appBarHeight = appBarLayout.getHeight();
+            ViewGroup.LayoutParams imageParams = backgroundImage.getLayoutParams();
+            imageParams.height = appBarHeight;
+            backgroundImage.setLayoutParams(imageParams);
         });
 
     }
@@ -137,34 +131,31 @@ public class PersonalFragment extends BaseFragment {
                 .load(R.drawable.user_background)
                 .apply(RequestOptions.bitmapTransform(new BlurTransformation(25)));
 
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                float scrollProgress = (float) Math.abs(verticalOffset) / appBarLayout.getTotalScrollRange();
+        appBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
+            float scrollProgress = (float) Math.abs(verticalOffset) / appBarLayout.getTotalScrollRange();
 
-                // 放大效果
-                float scale = 1 + (0.2f * (1 - scrollProgress));
-                backgroundImage.setScaleX(scale);
-                backgroundImage.setScaleY(scale);
+            // 放大效果
+            float scale = 1 + (0.2f * (1 - scrollProgress));
+            backgroundImage.setScaleX(scale);
+            backgroundImage.setScaleY(scale);
 
-                // 使用防抖动机制更新背景
-                if (updateBackgroundRunnable != null) {
-                    handler.removeCallbacks(updateBackgroundRunnable);
-                }
-                updateBackgroundRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (scrollProgress > 0.1f) {
-                            blurredBuilder.into(backgroundImage);
-                        } else {
-                            Glide.with(PersonalFragment.this)
-                                    .load(R.drawable.user_background)
-                                    .into(backgroundImage);
-                        }
-                    }
-                };
-                handler.postDelayed(updateBackgroundRunnable, DEBOUNCE_DELAY);
+            // 使用防抖动机制更新背景
+            if (updateBackgroundRunnable != null) {
+                handler.removeCallbacks(updateBackgroundRunnable);
             }
+            updateBackgroundRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    if (scrollProgress > 0.1f) {
+                        blurredBuilder.into(backgroundImage);
+                    } else {
+                        Glide.with(PersonalFragment.this)
+                                .load(R.drawable.user_background)
+                                .into(backgroundImage);
+                    }
+                }
+            };
+            handler.postDelayed(updateBackgroundRunnable, DEBOUNCE_DELAY);
         });
     }
 
