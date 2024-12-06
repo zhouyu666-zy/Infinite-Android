@@ -69,13 +69,6 @@ public class PageLayoutManager extends LinearLayoutManager implements RecyclerVi
 
     @Override
     public void onChildViewAttachedToWindow(@NonNull View view) {
-        //播放视频操作 即将要播放的是上一个视频 还是下一个视频
-//        int position = getPosition(view);
-//        if (0 == position) {
-//            if (mOnViewPagerListener != null) {
-//                mOnViewPagerListener.onPageSelected(getPosition(view), false);
-//            }
-//        }
     }
 
     @Override

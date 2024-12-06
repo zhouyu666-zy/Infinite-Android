@@ -70,7 +70,7 @@ public class MainActivity extends BaseActivity {
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
             @Override
             public void onPageSelected(int position) {
-                
+
                 changePage(position);
                 if(position != 0){
                     if(VideoAdapter.currPlayViewHolder.isPlaying()){

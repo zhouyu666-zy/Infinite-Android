@@ -60,6 +60,27 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         this.videoList = diaryList;
         this.activity = activity;
         this.fragment = fragment;
+
+        //解决RecyclerView滑动子视图获取不到事件的问题
+        fragment.videoRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+            @Override
+            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+                if(e.getAction() == MotionEvent.ACTION_UP){
+                    //抬起时如果视频还处于长按加速状态，则恢复倍速
+                    if(currPlayViewHolder.isLongPress){
+                        currPlayViewHolder.setPlaySpeed(1.0f);
+                        currPlayViewHolder.isLongPress = false;
+                    }
+                }
+                return false;
+            }
+            @Override
+            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {}
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
     }
 
     public List<Video.Data> getVideoList() {
@@ -83,6 +104,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.reset();
         Video.Data video = videoList.get(position);
         holder.video_seekBar.setProgress(0);
         holder.video_play_image.setVisibility(View.GONE);
@@ -90,6 +112,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         if(position == 0){
             holder.exoMediaPlayer.setPlayWhenReady(true); //第一条视频允许自动播放
             holder.playVideo();
+            preloadVideo(1); //预加载下一条视频
         }
 
         holder.author_nickname.setText("@" + video.getNickname());
@@ -167,6 +190,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         // 进度条是否在拖动
         private boolean isSeekBarTouch = false;
         private final int seekBarMax = 1000;
+        public boolean isLongPress = false;
 
         public ViewHolder(View view) {
             super(view);
@@ -283,7 +307,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
                     // 单击事件逻辑，切换播放/暂停
                     if (isPlaying()) {
                         pauseVideo();
-                        //缩小动画
+                        // 缩小动画
                         video_play_image.setVisibility(View.VISIBLE);
                         video_play_image.setScaleX(1.5f);
                         video_play_image.setScaleY(1.5f);
@@ -295,7 +319,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
                                 .withEndAction(null);
                     } else {
                         playVideo();
-                        //淡出动画
+                        // 淡出动画
                         video_play_image.animate()
                                 .alpha(0f)
                                 .setDuration(200)
@@ -305,15 +329,16 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
 
                 @Override
                 public void onLongPress(MotionEvent event) {
-                    ConsoleUtils.logErr("长按开始");
                     // 长按开始逻辑，例如加速播放
                     setPlaySpeed(3.0f);
+                    isLongPress = true;
                 }
 
                 @Override
                 public void onLongPressFinish(MotionEvent event) {
                     // 长按结束逻辑，例如恢复正常播放速度
                     setPlaySpeed(1.0f);
+                    isLongPress = false;
                 }
             }, itemView.getContext()));
         }

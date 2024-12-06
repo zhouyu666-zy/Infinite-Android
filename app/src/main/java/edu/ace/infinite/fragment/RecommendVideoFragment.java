@@ -7,9 +7,11 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.OrientationHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -57,6 +59,7 @@ public class RecommendVideoFragment extends BaseFragment {
         }).start();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void initVideoRecyclerView(List<Video.Data> videoList) {
         videoRecyclerView = findViewById(R.id.videoRecyclerView);
         //设置为0，可以保证同时只有3条视频在加载
