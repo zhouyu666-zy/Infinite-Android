@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ace.infinite.R;
+import edu.ace.infinite.fragment.PersonalFragment;
 import edu.ace.infinite.fragment.RecommendVideoFragment;
 import edu.ace.infinite.view.CustomViewPager;
 import me.ibrahimsn.lib.SmoothBottomBar;
@@ -43,10 +44,11 @@ public class MainActivity extends BaseActivity {
         fragmentList.add(new RecommendVideoFragment(this));
 //        fragmentList.add(new RecommendVideoFragment(this));
 //        fragmentList.add(new RecommendVideoFragment(this));
-
+        fragmentList.add(new PersonalFragment());
+        fragmentList.add(new PersonalFragment());
 
         //设置预加载页数
-        view_pager.setOffscreenPageLimit(4);
+        view_pager.setOffscreenPageLimit(fragmentList.size());
 
         view_pager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_SET_USER_VISIBLE_HINT) {
             @NotNull
