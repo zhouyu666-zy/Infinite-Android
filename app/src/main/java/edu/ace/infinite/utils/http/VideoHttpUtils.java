@@ -28,7 +28,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class VideoHttpUtils {
-    public final static String IP = "http://192.168.97.202:8181";
+//    public final static String IP = "http://192.168.97.202:8181";
+    public final static String IP = "http://192.168.64.126:8181";
     public static OkHttpClient client = new OkHttpClient()
             .newBuilder().connectTimeout(5000, TimeUnit.MILLISECONDS)
             .followRedirects(true) // 默认为 true
