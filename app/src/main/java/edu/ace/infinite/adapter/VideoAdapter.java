@@ -85,6 +85,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Video.Data video = videoList.get(position);
         holder.video_seekBar.setProgress(0);
+        holder.video_play_image.setVisibility(View.GONE);
 
         if(position == 0){
             holder.exoMediaPlayer.setPlayWhenReady(true); //第一条视频允许自动播放
@@ -160,6 +161,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         private SeekBar video_seekBar;
         private View seekBarParent;
         private LoveView loveView;
+        private ImageView video_play_image;
         public boolean isInitializeComplete = false;
         private String videoId = "null";
         // 进度条是否在拖动
@@ -173,6 +175,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
             author_avatar = view.findViewById(R.id.author_avatar);
             video_seekBar = view.findViewById(R.id.video_seekBar);
             seekBarParent = view.findViewById(R.id.seekBar_parent);
+            video_play_image = view.findViewById(R.id.video_play_image);
             video_seekBar.setMax(seekBarMax);
 
             loveView = view.findViewById(R.id.loveView);
@@ -280,8 +283,23 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
                     // 单击事件逻辑，切换播放/暂停
                     if (isPlaying()) {
                         pauseVideo();
+                        //缩小动画
+                        video_play_image.setVisibility(View.VISIBLE);
+                        video_play_image.setScaleX(1.5f);
+                        video_play_image.setScaleY(1.5f);
+                        video_play_image.setAlpha(0.6f);
+                        video_play_image.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .setDuration(100)
+                                .withEndAction(null);
                     } else {
                         playVideo();
+                        //淡出动画
+                        video_play_image.animate()
+                                .alpha(0f)
+                                .setDuration(200)
+                                .withEndAction(() -> video_play_image.setVisibility(View.GONE));
                     }
                 }
 
@@ -317,6 +335,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
             if(isInitializeComplete){
                 exoMediaPlayer.start();
             }
+            video_play_image.setVisibility(View.GONE);
             timeHandler.post(new Runnable() {
                 @Override
                 public void run() {

@@ -25,7 +25,7 @@ public class EventUtils {
         /**
          * 两次点击时间间隔，单位毫秒
          */
-        private final int totalTime = 300;
+        private final int totalTime = 200;
         /**
          * 自定义回调接口
          */

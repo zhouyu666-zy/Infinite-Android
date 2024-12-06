@@ -17,12 +17,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-<!--    <TextureView-->
-<!--        android:id="@+id/videoView"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:background="#000000"-->
-<!--        android:layout_height="match_parent" />-->
-
+    <ImageView
+        android:id="@+id/video_play_image"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/video_play_icon"
+        android:alpha="0.6"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"/>
 
     <LinearLayout
         android:layout_width="match_parent"
