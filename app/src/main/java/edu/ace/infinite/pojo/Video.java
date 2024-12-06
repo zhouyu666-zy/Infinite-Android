@@ -40,6 +40,7 @@ public class Video {
         private String uid;
         private String videoId;
         private String videoSrc;
+        private String type;
 
         public String getAuthorAvatar() {
             return authorAvatar;
@@ -103,6 +104,14 @@ public class Video {
 
         public void setVideoSrc(String videoSrc) {
             this.videoSrc = videoSrc;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
         }
     }
 }

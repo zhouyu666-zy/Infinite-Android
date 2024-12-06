@@ -46,6 +46,7 @@ import edu.ace.infinite.application.Application;
 import edu.ace.infinite.fragment.RecommendVideoFragment;
 import edu.ace.infinite.pojo.Video;
 import edu.ace.infinite.utils.ConsoleUtils;
+import edu.ace.infinite.utils.http.VideoHttpUtils;
 import edu.ace.infinite.utils.videoCache.HttpProxyCacheServer;
 import edu.ace.infinite.view.CircleImage;
 import edu.ace.infinite.view.EventUtils;
@@ -106,6 +107,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.reset();
         Video.Data video = videoList.get(position);
+        holder.video = video;
         holder.video_seekBar.setProgress(0);
         holder.video_play_image.setVisibility(View.GONE);
 
@@ -177,6 +179,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public VideoView videoView;
         public ExoMediaPlayer exoMediaPlayer;
+        private Video.Data video;
         private boolean isPlay;
         private TextView video_title;
         private TextView author_nickname;
@@ -347,6 +350,9 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         private void handleDoubleTap(MotionEvent event) {
             loveView.addLoveView(event);
             ConsoleUtils.logErr("双击" + System.currentTimeMillis());
+            new Thread(() -> {
+                VideoHttpUtils.likeVideo(true,video);
+            }).start();
         }
 
         public boolean isPlaying() {

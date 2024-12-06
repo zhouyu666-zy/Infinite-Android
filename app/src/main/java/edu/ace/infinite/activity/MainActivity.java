@@ -65,7 +65,7 @@ public class MainActivity extends BaseActivity {
         });
 
         view_pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
+            private boolean isPauseVideo = false;
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
             @Override
@@ -73,8 +73,14 @@ public class MainActivity extends BaseActivity {
 
                 changePage(position);
                 if(position != 0){
-                    if(VideoAdapter.currPlayViewHolder.isPlaying()){
+                    if(VideoAdapter.currPlayViewHolder != null && VideoAdapter.currPlayViewHolder.isPlaying()){
                         VideoAdapter.currPlayViewHolder.pauseVideo();
+                        isPauseVideo = true;
+                    }
+                }else {
+                    if(isPauseVideo){
+                        VideoAdapter.currPlayViewHolder.playVideo();
+                        isPauseVideo = false;
                     }
                 }
             }

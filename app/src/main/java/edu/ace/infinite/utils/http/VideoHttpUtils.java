@@ -1,6 +1,7 @@
 package edu.ace.infinite.utils.http;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.gson.Gson;
@@ -16,9 +17,11 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import edu.ace.infinite.pojo.Like;
 import edu.ace.infinite.pojo.Video;
 import edu.ace.infinite.utils.ConsoleUtils;
 import okhttp3.Headers;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -33,8 +36,11 @@ public class VideoHttpUtils {
             .retryOnConnectionFailure(true) // 默认为 true
             .readTimeout(6000, TimeUnit.MILLISECONDS).build();
 
+    /**
+     * 获取推荐视频
+     */
     public static Video getRecommentVideo(){
-        Request request = new Request.Builder().url(IP + "/api/video/list")
+        Request request = new Request.Builder().url(IP + "/api/video/getRecommendList")
                 .build();
         try {
             String result = client.newCall(request).execute().body().string();
@@ -49,6 +55,24 @@ public class VideoHttpUtils {
         }
         return null;
     }
+
+    public static void likeVideo(boolean isLike,Video.Data video){
+        Like like = new Like("1",video,isLike);
+        String json = new Gson().toJson(like);
+        ConsoleUtils.logErr(json);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json);
+        Request request = new Request.Builder().url(IP + "/api/video/like")
+                .post(requestBody)
+                .build();
+        try {
+            String result = client.newCall(request).execute().body().string();
+            ConsoleUtils.logErr(result);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     public static MediaSource getMediaVideoSource(Context context, String src){
         ExoSourceBuilder exoSourceBuilder = new ExoSourceBuilder(context,src);
