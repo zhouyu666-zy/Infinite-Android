@@ -97,37 +97,14 @@ public class PersonalFragment extends BaseFragment {
                 .load(R.drawable.video_cover)
                 .into(backgroundImage);
 
-        // 创建一个模糊处理的 RequestBuilder
-        RequestBuilder<Drawable> blurredBuilder = Glide.with(this)
-                .load(R.drawable.user_background)
-                .apply(RequestOptions.bitmapTransform(new BlurTransformation(25)));
 
 
-        
+
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.BaseOnOffsetChangedListener() {
 
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                float scrollProgress = (float) Math.abs(verticalOffset) / appBarLayout.getTotalScrollRange();
-                // 放大效果
-                float scale = 1 + (0.2f * (1 - scrollProgress));
-                backgroundImage.setScaleX(scale);
-                backgroundImage.setScaleY(scale);
 
-                // 使用防抖动机制更新背景
-                if (updateBackgroundRunnable != null) {
-                    handler.removeCallbacks(updateBackgroundRunnable);
-                }
-                updateBackgroundRunnable = () -> {
-                    if (scrollProgress > 0.1f) {
-                        blurredBuilder.into(backgroundImage);
-                    } else {
-                        Glide.with(PersonalFragment.this)
-                                .load(R.drawable.user_background)
-                                .into(backgroundImage);
-                    }
-                };
-                handler.postDelayed(updateBackgroundRunnable, DEBOUNCE_DELAY);
             }
         });
     }

@@ -60,7 +60,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
 
-    protected void setStatusBarTextColor(boolean dark) {
+    public void setStatusBarTextColor(boolean dark) {
         View decor = getWindow().getDecorView();
         if (dark) {
             decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);

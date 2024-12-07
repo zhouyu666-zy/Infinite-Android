@@ -1,6 +1,8 @@
 package edu.ace.infinite.activity;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Window;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +23,7 @@ import edu.ace.infinite.adapter.VideoAdapter;
 import edu.ace.infinite.fragment.MessageFragment;
 import edu.ace.infinite.fragment.PersonalFragment;
 import edu.ace.infinite.fragment.RecommendVideoFragment;
+import edu.ace.infinite.utils.ConsoleUtils;
 import edu.ace.infinite.view.CustomViewPager;
 import me.ibrahimsn.lib.SmoothBottomBar;
 
@@ -71,6 +74,8 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onPageSelected(int position) {
                 changePage(position);
+
+                //控制视频播放
                 if(VideoAdapter.currPlayViewHolder != null ){
                     if(position != 0){
                         if(VideoAdapter.currPlayViewHolder.isInitializeComplete){
