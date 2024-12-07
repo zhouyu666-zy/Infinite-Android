@@ -88,7 +88,7 @@ public class PersonalFragment extends BaseFragment {
         });
 
     }
-    
+
 
     /// 设置背景效果
     private void setupBackgroundEffect() {
@@ -103,17 +103,7 @@ public class PersonalFragment extends BaseFragment {
                 .apply(RequestOptions.bitmapTransform(new BlurTransformation(25)));
 
 
-        // 记录原始高度
-        Drawable drawable = backgroundImage.getDrawable();
-        if (drawable != null) {
-            originalHeight = drawable.getIntrinsicHeight();
-        }
-
-        appBarLayout.addOnOffsetChangedListener((appBarLayout1, verticalOffset) -> {
-            isExpanded = Math.abs(verticalOffset) <= appBarLayout1.getTotalScrollRange() * 0.01;
-        });
-
-
+        
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.BaseOnOffsetChangedListener() {
 
             @Override
