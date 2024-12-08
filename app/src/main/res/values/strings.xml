@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Infinite</string>
+    <string name="app_name">无限视界</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>

@@ -71,11 +71,11 @@ public class PersonalFragment extends BaseFragment {
         // 获取状态栏高度
         int statusBarHeight = PhoneMessage.getStatusBarHeight(getContext());
 
-        // 调整用户信息 ConstraintLayout 的顶部边距
-        View userInfoLayout = view.findViewById(R.id.user_info_layout); // 确保给 ConstraintLayout 设置了 id
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) userInfoLayout.getLayoutParams();
-        params.topMargin = statusBarHeight;
-        userInfoLayout.setLayoutParams(params);
+//        // 调整用户信息 ConstraintLayout 的顶部边距
+//        View userInfoLayout = view.findViewById(R.id.user_info_layout); // 确保给 ConstraintLayout 设置了 id
+//        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) userInfoLayout.getLayoutParams();
+//        params.topMargin = statusBarHeight;
+//        userInfoLayout.setLayoutParams(params);
 
         // 动态调整背景图片的高度
         AppBarLayout appBarLayout = view.findViewById(R.id.appbar);

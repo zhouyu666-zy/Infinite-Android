@@ -1,6 +1,8 @@
 package edu.ace.infinite.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,17 +10,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+
 import edu.ace.infinite.R;
-import edu.ace.infinite.model.VideoItem;
+import edu.ace.infinite.activity.VideoPlayActivity;
+import edu.ace.infinite.pojo.Video;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class VideoGridAdapter extends RecyclerView.Adapter<VideoGridAdapter.VideoViewHolder> {
+public class PersonalVideoAdapter extends RecyclerView.Adapter<PersonalVideoAdapter.VideoViewHolder> {
 
-    private List<VideoItem> videos = new ArrayList<>();
+    private List<Video.Data> videos = new ArrayList<>();
     private Context context;
 
-    public VideoGridAdapter(Context context) {
+    public PersonalVideoAdapter(Context context) {
         this.context = context;
     }
 
@@ -30,10 +37,19 @@ public class VideoGridAdapter extends RecyclerView.Adapter<VideoGridAdapter.Vide
     }
 
     @Override
-    public void onBindViewHolder(@NonNull VideoViewHolder holder, int position) {
-        VideoItem video = videos.get(position);
-        holder.imageView.setImageResource(video.getThumbnailResId());
-        holder.textView.setText(video.getTitle());
+    public void onBindViewHolder(@NonNull VideoViewHolder holder, @SuppressLint("RecyclerView") int position) {
+        Video.Data video = videos.get(position);
+        //加载预览图片
+        Glide.with(context).load(video.getCoverSrc()).into(holder.imageView);
+        //加载标题
+        holder.textView.setText(video.getDesc());
+
+        holder.itemView.setOnClickListener(view -> {
+            VideoPlayActivity.videoList = videos;
+            VideoPlayActivity.position = position;
+            Intent intent = new Intent(context, VideoPlayActivity.class);
+            context.startActivity(intent);
+        });
     }
 
     @Override
@@ -41,7 +57,7 @@ public class VideoGridAdapter extends RecyclerView.Adapter<VideoGridAdapter.Vide
         return videos.size();
     }
 
-    public void setVideos(List<VideoItem> videos) {
+    public void setVideos(List<Video.Data> videos) {
         this.videos = videos;
         notifyDataSetChanged();
     }

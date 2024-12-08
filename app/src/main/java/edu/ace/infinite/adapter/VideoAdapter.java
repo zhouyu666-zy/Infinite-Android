@@ -1,14 +1,8 @@
 package edu.ace.infinite.adapter;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Rect;
-import android.net.Uri;
 import android.os.Handler;
-import android.telephony.PhoneNumberUtils;
-import android.util.EventLog;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 //import com.bumptech.glide.Glide;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.VideoDecoder;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -34,17 +27,13 @@ import org.salient.artplayer.exo.ExoMediaPlayer;
 import org.salient.artplayer.exo.ExoSourceBuilder;
 import org.salient.artplayer.ui.VideoView;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import edu.ace.infinite.R;
 import edu.ace.infinite.activity.BaseActivity;
+import edu.ace.infinite.activity.MainActivity;
+import edu.ace.infinite.activity.VideoPlayActivity;
 import edu.ace.infinite.application.Application;
-import edu.ace.infinite.fragment.RecommendVideoFragment;
 import edu.ace.infinite.pojo.Video;
 import edu.ace.infinite.utils.ConsoleUtils;
 import edu.ace.infinite.utils.http.VideoHttpUtils;
@@ -57,23 +46,33 @@ import edu.ace.infinite.view.MyToast;
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> {
     private final List<Video.Data> videoList;
     private BaseActivity activity;
-    private RecommendVideoFragment fragment;
+    private RecyclerView recyclerView;
+    private boolean isRecommend;
 
-    public VideoAdapter(List<Video.Data> diaryList, BaseActivity activity, RecommendVideoFragment fragment) {
+    public VideoAdapter(List<Video.Data> diaryList, BaseActivity activity, RecyclerView recyclerView,boolean isRecommend) {
         this.videoList = diaryList;
         this.activity = activity;
-        this.fragment = fragment;
+        this.recyclerView = recyclerView;
+        this.isRecommend = isRecommend;
 
         //解决RecyclerView滑动子视图获取不到事件的问题
-        fragment.videoRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
             @Override
             public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
                 if(e.getAction() == MotionEvent.ACTION_UP){
                     //抬起时如果视频还处于长按加速状态，则恢复倍速
-                    if(currPlayViewHolder.isLongPress){
-                        currPlayViewHolder.setPlaySpeed(1.0f);
-                        currPlayViewHolder.isLongPress = false;
+                    if(isRecommend){
+                        if(currMainPlayViewHolder.isLongPress){
+                            currMainPlayViewHolder.setPlaySpeed(1.0f);
+                            currMainPlayViewHolder.isLongPress = false;
+                        }
+                    }else {
+                        if(currPlayViewHolder.isLongPress){
+                            currPlayViewHolder.setPlaySpeed(1.0f);
+                            currPlayViewHolder.isLongPress = false;
+                        }
                     }
+
                 }
                 return false;
             }
@@ -108,15 +107,17 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.reset();
+        holder.isRecommend = isRecommend;
         Video.Data video = videoList.get(position);
         holder.video = video;
         holder.video_seekBar.setProgress(0);
         holder.video_play_image.setVisibility(View.GONE);
 
-        if(position == 0){
+        boolean isFirst = !isRecommend && position == VideoPlayActivity.position;
+        if(position == 0 || isFirst){
             holder.exoMediaPlayer.setPlayWhenReady(true); //第一条视频允许自动播放
             holder.playVideo();
-            preloadVideo(1); //预加载下一条视频
+            preloadVideo(position+1); //预加载下一条视频
         }
 
         holder.author_nickname.setText("@" + video.getNickname());
@@ -196,7 +197,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
 
 
     private RecyclerView.ViewHolder findViewHolderForPosition(int position) {
-        return fragment.videoRecyclerView.findViewHolderForAdapterPosition(position);
+        return recyclerView.findViewHolderForAdapterPosition(position);
     }
 
 
@@ -206,8 +207,9 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     }
 
     @SuppressLint("StaticFieldLeak")
+    public static ViewHolder currMainPlayViewHolder = null;
+    @SuppressLint("StaticFieldLeak")
     public static ViewHolder currPlayViewHolder = null;
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public VideoView videoView;
         public ExoMediaPlayer exoMediaPlayer;
@@ -228,6 +230,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         private boolean isSeekBarTouch = false;
         private final int seekBarMax = 1000;
         public boolean isLongPress = false;
+        private boolean isRecommend;
 
         public ViewHolder(View view) {
             super(view);
@@ -407,7 +410,11 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         private final Handler timeHandler = new Handler();
         public void playVideo() {
             isPlay = true;
-            currPlayViewHolder = this;
+            if(isRecommend){
+                currMainPlayViewHolder = this;
+            }else {
+                currPlayViewHolder = this;
+            }
             if(isInitializeComplete){
                 exoMediaPlayer.start();
             }

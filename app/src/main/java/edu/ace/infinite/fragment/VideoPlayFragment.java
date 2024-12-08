@@ -3,7 +3,6 @@ package edu.ace.infinite.fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.os.ParcelUuid;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,25 +10,26 @@ import android.view.ViewGroup;
 import androidx.recyclerview.widget.OrientationHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.ace.infinite.R;
 import edu.ace.infinite.activity.BaseActivity;
+import edu.ace.infinite.activity.VideoPlayActivity;
 import edu.ace.infinite.adapter.VideoAdapter;
 import edu.ace.infinite.pojo.Video;
-import edu.ace.infinite.utils.http.VideoHttpUtils;
+import edu.ace.infinite.view.MyToast;
 import edu.ace.infinite.view.video.OnViewPagerListener;
 import edu.ace.infinite.view.video.PageLayoutManager;
 
-public class RecommendVideoFragment extends BaseFragment {
+public class VideoPlayFragment extends BaseFragment {
     private BaseActivity activity;
     private VideoAdapter videoAdapter;
     public RecyclerView videoRecyclerView;
 
-    public RecommendVideoFragment(){}
+    public VideoPlayFragment(){}
 
-    public RecommendVideoFragment(BaseActivity activity){
+    public VideoPlayFragment(BaseActivity activity){
         this.activity = activity;
     }
 
@@ -46,16 +46,12 @@ public class RecommendVideoFragment extends BaseFragment {
 
     @SuppressLint("SetTextI18n")
     private void initView() {
-        new Thread(() -> {
-            Video video = VideoHttpUtils.getRecommentVideo();
-            activity.runOnUiThread(() -> {
-                if(video != null){
-                    initVideoRecyclerView(video.getData());
-                }else {
-                    activity.showToast("网络请求失败");
-                }
-            });
-        }).start();
+        if(VideoPlayActivity.videoList != null && !VideoPlayActivity.videoList.isEmpty()){
+            ArrayList<Video.Data> data = new ArrayList<>(VideoPlayActivity.videoList);
+            initVideoRecyclerView(data);
+        }else {
+            MyToast.show("出错了");
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -66,8 +62,10 @@ public class RecommendVideoFragment extends BaseFragment {
 
         PageLayoutManager pageLayoutManager = new PageLayoutManager(activity, OrientationHelper.VERTICAL, false);
         videoRecyclerView.setLayoutManager(pageLayoutManager);
-        videoAdapter = new VideoAdapter(videoList, activity, videoRecyclerView,true);
+        videoAdapter = new VideoAdapter(videoList, activity, videoRecyclerView,false);
         videoRecyclerView.setAdapter(videoAdapter);
+        videoRecyclerView.scrollToPosition(VideoPlayActivity.position);
+        currentPosition = VideoPlayActivity.position;
 
         //设置滑动后选中和释放的监听
         pageLayoutManager.setOnViewPagerListener(new OnViewPagerListener() {
@@ -83,25 +81,11 @@ public class RecommendVideoFragment extends BaseFragment {
                 }
             }
 
-            private boolean isLoadMore = false;
             @Override
             public void onPageSelected(int position, boolean isBottom) {
 //                ConsoleUtils.logErr(TAG, "选中位置：" + position+",是否为底部："+isBottom);
                 currentPosition = position;
                 playVideo(position);
-                if(isBottom){
-                    if(!isLoadMore){
-                        //视频为底部时，加载更多视频
-                        new Thread(() -> {
-                            isLoadMore = true;
-                            Video video = VideoHttpUtils.getRecommentVideo();
-                            if(video != null){
-                                videoAdapter.addVideo(video.getData());
-                            }
-                            isLoadMore = false;
-                        }).start();
-                    }
-                }
             }
         });
     }
@@ -141,33 +125,30 @@ public class RecommendVideoFragment extends BaseFragment {
     @Override
     public void onStart() {
         super.onStart();
-        if(VideoAdapter.currMainPlayViewHolder != null && exitIsPlay){
-            VideoAdapter.currMainPlayViewHolder.playVideo();
-//            playVideo(currentPosition);
+        if(VideoAdapter.currPlayViewHolder != null && exitIsPlay){
+            VideoAdapter.currPlayViewHolder.playVideo();
         }
     }
     @Override
     public void onPause() {
         super.onPause();
-        if(VideoAdapter.currMainPlayViewHolder != null){
-            exitIsPlay = VideoAdapter.currMainPlayViewHolder.isPlaying();
-            VideoAdapter.currMainPlayViewHolder.pauseVideo();
-//            ConsoleUtils.logErr(exitIsPlay);
+        if(VideoAdapter.currPlayViewHolder != null){
+            exitIsPlay = VideoAdapter.currPlayViewHolder.isPlaying();
+            VideoAdapter.currPlayViewHolder.pauseVideo();
         }
-//        pauseVideo(currentPosition);
     }
 
 
     @Override
     public void onDestroyView() {
-        VideoAdapter.currMainPlayViewHolder = null;
+        VideoAdapter.currPlayViewHolder = null;
         super.onDestroyView();
         view = null;
     }
 
     @Override
     public void onDestroy() {
-        VideoAdapter.currMainPlayViewHolder = null;
+        VideoAdapter.currPlayViewHolder = null;
         super.onDestroy();
         if(view != null){
             view = null;

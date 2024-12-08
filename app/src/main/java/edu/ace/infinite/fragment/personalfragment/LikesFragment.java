@@ -8,16 +8,16 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import edu.ace.infinite.R;
-import edu.ace.infinite.adapter.VideoGridAdapter;
-import edu.ace.infinite.model.VideoItem;
+import edu.ace.infinite.adapter.PersonalVideoAdapter;
+import edu.ace.infinite.pojo.Video;
+import edu.ace.infinite.utils.http.VideoHttpUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class LikesFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private VideoGridAdapter adapter;
+    private PersonalVideoAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -26,25 +26,49 @@ public class LikesFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
-        adapter = new VideoGridAdapter(getContext());
+        adapter = new PersonalVideoAdapter(getContext());
         recyclerView.setAdapter(adapter);
 
-        loadLikedVideos();
+        initView();
 
         return view;
     }
 
-    private void loadLikedVideos() {
-        // TODO: 从服务器加载用户喜欢的视频数据
-        // 这里使用模拟数据
-        adapter.setVideos(generateDummyLikedData());
+    @Override
+    public void onStart() {
+        super.onStart();
+        refreshList = true;
     }
 
-    private List<VideoItem> generateDummyLikedData() {
-        List<VideoItem> dummyData = new ArrayList<>();
-        for (int i = 0; i < 15; i++) {
-            dummyData.add(new VideoItem("Liked Video " + i, R.drawable.video_cover));
+    public static boolean refreshList = false;
+    private void initView() {
+        refreshList = true;
+        recyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                if(refreshList){
+                    refreshList = false;
+                    loadList();
+                }
+                recyclerView.postDelayed(this, 500);
+            }
+        });
+    }
+
+    private boolean isRefreshing = false;
+    private void loadList() {
+        if(isRefreshing){
+            return;
         }
-        return dummyData;
+        isRefreshing = true;
+        //获取点赞数据
+        new Thread(() -> {
+            Video likeList = VideoHttpUtils.getLikeList();
+            List<Video.Data> videoList = likeList.getData();
+            getActivity().runOnUiThread(() -> {
+                adapter.setVideos(videoList);
+                isRefreshing = false;
+            });
+        }).start();
     }
 }

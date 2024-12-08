@@ -1,14 +1,7 @@
 package edu.ace.infinite.activity;
 
-import android.graphics.Color;
 import android.os.Bundle;
-import android.view.Window;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -23,7 +16,9 @@ import edu.ace.infinite.adapter.VideoAdapter;
 import edu.ace.infinite.fragment.MessageFragment;
 import edu.ace.infinite.fragment.PersonalFragment;
 import edu.ace.infinite.fragment.RecommendVideoFragment;
-import edu.ace.infinite.utils.ConsoleUtils;
+import edu.ace.infinite.fragment.personalfragment.FavoritesFragment;
+import edu.ace.infinite.fragment.personalfragment.LikesFragment;
+import edu.ace.infinite.fragment.personalfragment.WorksFragment;
 import edu.ace.infinite.view.CustomViewPager;
 import me.ibrahimsn.lib.SmoothBottomBar;
 
@@ -75,21 +70,27 @@ public class MainActivity extends BaseActivity {
             public void onPageSelected(int position) {
                 changePage(position);
 
+                if(position == 2){
+                    FavoritesFragment.refreshList = true;
+                    LikesFragment.refreshList = true;
+                    WorksFragment.refreshList = true;
+                }
+
                 //控制视频播放
-                if(VideoAdapter.currPlayViewHolder != null ){
+                if(VideoAdapter.currMainPlayViewHolder != null ){
                     if(position != 0){
-                        if(VideoAdapter.currPlayViewHolder.isInitializeComplete){
-                            if(VideoAdapter.currPlayViewHolder.isPlaying()){
-                                VideoAdapter.currPlayViewHolder.pauseVideo();
+                        if(VideoAdapter.currMainPlayViewHolder.isInitializeComplete){
+                            if(VideoAdapter.currMainPlayViewHolder.isPlaying()){
+                                VideoAdapter.currMainPlayViewHolder.pauseVideo();
                                 isPauseVideo = true;
                             }
                         }else {
-                            VideoAdapter.currPlayViewHolder.pauseVideo();
+                            VideoAdapter.currMainPlayViewHolder.pauseVideo();
                             isPauseVideo = true;
                         }
                     }else {
                         if(isPauseVideo){
-                            VideoAdapter.currPlayViewHolder.playVideo();
+                            VideoAdapter.currMainPlayViewHolder.playVideo();
                             isPauseVideo = false;
                         }
                     }

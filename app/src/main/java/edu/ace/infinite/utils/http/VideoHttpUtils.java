@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import edu.ace.infinite.pojo.Like;
 import edu.ace.infinite.pojo.Video;
 import edu.ace.infinite.utils.ConsoleUtils;
+import okhttp3.FormBody;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -29,6 +30,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class VideoHttpUtils {
+    private static String userId = "1";
     public final static String IP = "http://192.168.97.202:8181";
 //    public final static String IP = "http://192.168.64.126:8181";
     public static OkHttpClient client = new OkHttpClient()
@@ -62,7 +64,6 @@ public class VideoHttpUtils {
      * 喜欢/不喜欢视频
      */
     public static boolean likeVideo(boolean isLike,Video.Data video){
-        String userId = "1";
         Like like = new Like(userId, video, isLike);
         String json = new Gson().toJson(like);
         String url = IP;
@@ -86,6 +87,26 @@ public class VideoHttpUtils {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static Video getLikeList(){
+        FormBody.Builder formBody = new FormBody.Builder();
+        formBody.add("userId", userId);
+        Request request = new Request.Builder().url(IP + "/api/video/getLikeList")
+                .post(formBody.build())
+                .build();
+        try {
+            String result = client.newCall(request).execute().body().string();
+            Video video = new Gson().fromJson(result, Video.class);
+            // 假设 Video.Data 是一个类，video.getData() 返回一个 List<Video.Data>
+            List<Video.Data> dataList = video.getData();
+            //移除空对象
+            dataList.removeIf(Objects::isNull);
+            return video;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
