@@ -1,7 +1,14 @@
 package edu.ace.infinite.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -19,7 +26,10 @@ import edu.ace.infinite.fragment.RecommendVideoFragment;
 import edu.ace.infinite.fragment.personalfragment.FavoritesFragment;
 import edu.ace.infinite.fragment.personalfragment.LikesFragment;
 import edu.ace.infinite.fragment.personalfragment.WorksFragment;
+import edu.ace.infinite.utils.ConsoleUtils;
+import edu.ace.infinite.utils.PhoneMessage;
 import edu.ace.infinite.view.CustomViewPager;
+import edu.ace.infinite.view.MyToast;
 import me.ibrahimsn.lib.SmoothBottomBar;
 
 public class MainActivity extends BaseActivity {
@@ -27,6 +37,8 @@ public class MainActivity extends BaseActivity {
     private List<Fragment> fragmentList;
     private CustomViewPager view_pager;
     private SmoothBottomBar smoothBottomBar;
+    private DrawerLayout drawerLayout;
+    private boolean isOpenDrawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +47,38 @@ public class MainActivity extends BaseActivity {
 
 
         initView();
+        initDrawerLayout();
+    }
+
+    private void initDrawerLayout() {
+        LinearLayout left_view = findViewById(R.id.main_drawer_view);
+        left_view.setPadding(0, PhoneMessage.statusBarHeight,0,0);
+        ViewGroup.LayoutParams leftViewLayoutParams = left_view.getLayoutParams();
+        leftViewLayoutParams.width = (int) (PhoneMessage.getWidthPixels() * 0.7);
+        left_view.setLayoutParams(leftViewLayoutParams);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+                // 实现整个 Activity 左移效果
+                // 当侧滑菜单滑动时，移动主内容
+                View content = drawerLayout.getChildAt(0);
+                float distance = drawerView.getWidth() * slideOffset;
+                content.setTranslationX(-distance);
+            }
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+                isOpenDrawerLayout = true;
+            }
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+                isOpenDrawerLayout = false;
+            }
+            @Override
+            public void onDrawerStateChanged(int newState) {
+            }
+        });
     }
 
     private void initView() {
@@ -117,4 +161,34 @@ public class MainActivity extends BaseActivity {
         view_pager.setCurrentItem(position);
         currPage = position;
     }
+
+    public void openDrawer() {
+        if(drawerLayout != null){
+            drawerLayout.openDrawer(GravityCompat.END);
+        }
+    }
+
+    private long touchTime = 0;
+    @Override
+    public void finish() {
+        if(isOpenDrawerLayout){
+            if(drawerLayout != null){
+                drawerLayout.closeDrawer(GravityCompat.END);
+            }
+            return;
+        }
+        //返回时提示再按一次退出程序
+        long currentTime = System.currentTimeMillis();
+        //等待的时间
+        if((currentTime-touchTime)>= 1000L) {
+            //让Toast的显示时间和等待时间相同
+            MyToast.show("再按一次返回键退出", 1000);
+            touchTime = currentTime;
+        }else {
+            moveTaskToBack(true);
+        }
+//        super.finish();
+    }
+
+
 }

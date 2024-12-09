@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -27,6 +28,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import edu.ace.infinite.R;
+import edu.ace.infinite.activity.MainActivity;
 import edu.ace.infinite.fragment.personalfragment.FavoritesFragment;
 import edu.ace.infinite.fragment.personalfragment.LikesFragment;
 import edu.ace.infinite.fragment.personalfragment.WorksFragment;
@@ -87,6 +89,12 @@ public class PersonalFragment extends BaseFragment {
             backgroundImage.setLayoutParams(imageParams);
         });
 
+        findViewById(R.id.open_drawer_view).setOnClickListener(view1 -> {
+            FragmentActivity activity = getActivity();
+            if(activity instanceof MainActivity){
+                ((MainActivity) activity).openDrawer();
+            }
+        });
     }
 
 

@@ -74,7 +74,28 @@
                         android:textSize="12sp"
                         android:textColor="@color/white" />
                 </LinearLayout>
+
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/open_drawer_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_gravity="end"
+                tools:ignore="UselessParent"
+                android:background="@drawable/touch_radius">
+                <ImageView
+                    app:tint="@color/white"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/move_item_icon"
+                    tools:ignore="ContentDescription" />
+            </LinearLayout>
+
+
+
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
 
