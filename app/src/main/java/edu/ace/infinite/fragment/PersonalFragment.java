@@ -70,14 +70,6 @@ public class PersonalFragment extends BaseFragment {
         requireActivity().getWindow().setStatusBarColor(Color.TRANSPARENT);
         requireActivity().getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        // 获取状态栏高度
-        int statusBarHeight = PhoneMessage.getStatusBarHeight(getContext());
-
-//        // 调整用户信息 ConstraintLayout 的顶部边距
-//        View userInfoLayout = view.findViewById(R.id.user_info_layout); // 确保给 ConstraintLayout 设置了 id
-//        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) userInfoLayout.getLayoutParams();
-//        params.topMargin = statusBarHeight;
-//        userInfoLayout.setLayoutParams(params);
 
         // 动态调整背景图片的高度
         AppBarLayout appBarLayout = view.findViewById(R.id.appbar);
@@ -104,9 +96,6 @@ public class PersonalFragment extends BaseFragment {
         Glide.with(this)
                 .load(R.drawable.video_cover)
                 .into(backgroundImage);
-
-
-
 
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.BaseOnOffsetChangedListener() {
 

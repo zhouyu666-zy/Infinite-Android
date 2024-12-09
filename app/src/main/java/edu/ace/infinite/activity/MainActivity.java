@@ -114,10 +114,19 @@ public class MainActivity extends BaseActivity {
             public void onPageSelected(int position) {
                 changePage(position);
 
-                if(position == 2){
-                    FavoritesFragment.refreshList = true;
-                    LikesFragment.refreshList = true;
-                    WorksFragment.refreshList = true;
+                switch (position) {
+                    case 0:
+                        smoothBottomBar.setBarBackgroundColor(getColor(R.color.black));
+                        break;
+                    case 1:
+                        smoothBottomBar.setBarBackgroundColor(getColor(R.color.white));
+                        break;
+                    case 2:
+                        smoothBottomBar.setBarBackgroundColor(getColor(R.color.white));
+                        FavoritesFragment.refreshList = true;
+                        LikesFragment.refreshList = true;
+                        WorksFragment.refreshList = true;
+                        break;
                 }
 
                 //控制视频播放

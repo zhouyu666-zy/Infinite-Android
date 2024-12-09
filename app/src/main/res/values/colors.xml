@@ -8,6 +8,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="textInputLayout">#E6FFFFFF</color>
+
     <!--默认触摸反馈效果-->
     <color name="selectableItemBackground">?android:selectableItemBackground</color>
     <!--默认触摸反馈效果颜色-->

@@ -71,4 +71,7 @@ dependencies {
 
     //音视频缓存库
     implementation 'com.danikula:videocache:2.7.1'
+
+    //动画库
+    implementation 'com.airbnb.android:lottie:6.1.0'
 }

@@ -1,5 +1,6 @@
 package edu.ace.infinite.fragment.personalfragment;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -29,7 +30,8 @@ public class FavoritesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_works, container, false);
 
         recyclerView = view.findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        int spanCount = 3;
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), spanCount));
         adapter = new PersonalVideoAdapter(getContext());
         recyclerView.setAdapter(adapter);
 

@@ -36,13 +36,14 @@ public class PersonalVideoAdapter extends RecyclerView.Adapter<PersonalVideoAdap
         return new VideoViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull VideoViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Video.Data video = videos.get(position);
         //加载预览图片
         Glide.with(context).load(video.getCoverSrc()).into(holder.imageView);
         //加载标题
-        holder.textView.setText(video.getDesc());
+        holder.textView.setText("@"+video.getNickname());
 
         holder.itemView.setOnClickListener(view -> {
             VideoPlayActivity.videoList = videos;

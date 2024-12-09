@@ -31,12 +31,12 @@ public class MessageFragment extends BaseFragment{
     private void initViews() {
         recyclerViewMessages = view.findViewById(R.id.recyclerView_messages);
         recyclerViewMessages.setLayoutManager(new LinearLayoutManager(getContext()));
-        messageList = fetchMessages(); // 获取消息列表的方法
+        messageList = getMessages(); // 获取消息列表的方法
         messageAdapter = new MessageAdapter(messageList);
         recyclerViewMessages.setAdapter(messageAdapter);
     }
 
-    private List<Message> fetchMessages() {
+    private List<Message> getMessages() {
         List<Message> messages = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             messages.add(new Message("消息1", "发送者1", ""));

@@ -31,6 +31,11 @@ public class Application extends android.app.Application {
         PhoneMessage.initMessage(context);
     }
 
+    public static Map<String,String> getLoginMessage() {
+        Map<String,String> map = new HashMap<>();
+//        map.put("userToken","1");
+        return map;
+    }
     //视频缓存
     private HttpProxyCacheServer proxy;
     public static class MyFileNameGenerator implements FileNameGenerator {
