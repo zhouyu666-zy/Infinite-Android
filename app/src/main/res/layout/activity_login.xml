@@ -5,20 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/Theme"
     android:focusableInTouchMode="true">
-
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/good_morning_img" />
-
-    </FrameLayout>
+<!--    #58B7F6-->
 
 
     <LinearLayout
@@ -39,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/gotham"
-                android:text=""
+                android:text="Hello，"
                 android:textColor="#ffffff"
                 android:textSize="32sp" />
 
@@ -85,8 +74,8 @@
 
 
     <LinearLayout
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -115,12 +104,12 @@
                 android:textColor="@color/white"
                 android:textColorHint="@color/textInputLayout"
                 android:textCursorDrawable="@drawable/input_gb"
-                android:textSize="15sp"
+                android:textSize="13sp"
                 tools:ignore="SpUsage" />
 
             <ImageView
-                android:layout_width="23dp"
-                android:layout_height="23dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="18dp"
                 android:src="@drawable/username_icon"
@@ -147,12 +136,12 @@
                 android:textColor="@color/white"
                 android:textColorHint="@color/textInputLayout"
                 android:textCursorDrawable="@drawable/input_gb"
-                android:textSize="15sp"
+                android:textSize="13sp"
                 tools:ignore="RtlSymmetry" />
 
             <ImageView
-                android:layout_width="23dp"
-                android:layout_height="23dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="18dp"
                 android:src="@drawable/password_icon"
@@ -196,7 +185,7 @@
                 android:textAllCaps="false"
                 android:textStyle="bold"
                 android:textColor="@color/textInputLayout"
-                android:textSize="15sp" />
+                android:textSize="13sp" />
 
             <Button
                 android:id="@+id/register_button"
@@ -209,7 +198,7 @@
                 android:text="注册用户"
                 android:textAllCaps="false"
                 android:textColor="@color/textInputLayout"
-                android:textSize="15sp"
+                android:textSize="13sp"
                 android:textStyle="bold" />
 
 

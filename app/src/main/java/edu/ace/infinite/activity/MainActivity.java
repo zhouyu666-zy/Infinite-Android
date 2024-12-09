@@ -106,6 +106,7 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        View cutOffLineView = findViewById(R.id.cutOffLineView);
         view_pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             private boolean isPauseVideo = false;
             @Override
@@ -117,12 +118,15 @@ public class MainActivity extends BaseActivity {
                 switch (position) {
                     case 0:
                         smoothBottomBar.setBarBackgroundColor(getColor(R.color.black));
+                        cutOffLineView.setBackgroundColor(getColor(R.color.black));
                         break;
                     case 1:
                         smoothBottomBar.setBarBackgroundColor(getColor(R.color.white));
+                        cutOffLineView.setBackgroundColor(getColor(R.color.cutOffLine));
                         break;
                     case 2:
                         smoothBottomBar.setBarBackgroundColor(getColor(R.color.white));
+                        cutOffLineView.setBackgroundColor(getColor(R.color.cutOffLine));
                         FavoritesFragment.refreshList = true;
                         LikesFragment.refreshList = true;
                         WorksFragment.refreshList = true;

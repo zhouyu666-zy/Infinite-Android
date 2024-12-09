@@ -65,11 +65,13 @@ public class WorksFragment extends Fragment {
         //获取点赞数据
         new Thread(() -> {
             Video likeList = VideoHttpUtils.getLikeList();
-            List<Video.Data> videoList = likeList.getData();
-            getActivity().runOnUiThread(() -> {
-                adapter.setVideos(videoList);
-                isRefreshing = false;
-            });
+            if(likeList != null){
+                List<Video.Data> videoList = likeList.getData();
+                getActivity().runOnUiThread(() -> {
+                    adapter.setVideos(videoList);
+                    isRefreshing = false;
+                });
+            }
         }).start();
     }
 }
