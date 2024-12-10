@@ -9,25 +9,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:background="#4A888888"
+        android:background="#60BEFB"
         android:elevation="4dp"
         android:orientation="vertical">
 
         <TextView
+            android:layout_marginTop="5dp"
             android:id="@+id/messageTitleTextView"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="16dp"
-            android:gravity="center"
+            android:layout_height="35dp"
+            android:gravity="center_horizontal"
             android:text="@string/message_title"
-            android:textColor="#1565C0"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textColor="@color/white"
+            android:textSize="18sp" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#90CAF9" />
+            android:background="@color/cutOffLine" />
 
     </LinearLayout>
 
@@ -37,7 +36,6 @@
         android:layout_height="match_parent"
         android:layout_below="@id/titleContainer"
         android:clipToPadding="false"
-        android:padding="8dp"
         android:scrollbars="vertical" />
 
 </RelativeLayout>

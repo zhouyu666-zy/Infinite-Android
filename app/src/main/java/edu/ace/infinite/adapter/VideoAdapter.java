@@ -106,7 +106,6 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.reset();
         holder.isRecommend = isRecommend;
         Video.Data video = videoList.get(position);
         holder.video = video;
@@ -154,32 +153,13 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
                 }).start();
             }
         });
-        loadVideo(holder, video);
-    }
 
-    //加载视频
-    private void loadVideo(ViewHolder holder, Video.Data video) {
-        try {
-            String videoId = video.getVideoId();
-            //不是同一视频执行加载
-            if (!holder.videoId.equals(videoId) || !holder.isInitializeComplete) {
-                if (!holder.videoId.equals("null")) {
-                    holder.reset();
-                }
-                holder.videoId = videoId;
-                HttpProxyCacheServer proxy = Application.getProxy();
-                String videoSrc = video.getVideoSrc();
-                String proxyUrl = proxy.getProxyUrl(videoSrc, videoId);
-                ExoSourceBuilder exoSourceBuilder = new ExoSourceBuilder(holder.itemView.getContext(), proxyUrl);
-                exoSourceBuilder.setCacheEnable(false);
-                MediaSource exoMediaSource = exoSourceBuilder.build();
-                holder.exoMediaPlayer.setMediaSource(exoMediaSource);
-                if (holder.videoView != null) {
-                    holder.videoView.prepare();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        holder.reset();
+        String videoSrc = video.getVideoSrc();
+        MediaSource videoSource = VideoHttpUtils.getMediaVideoSource(holder.itemView.getContext(), videoSrc);
+        holder.exoMediaPlayer.setMediaSource(videoSource);
+        if (holder.videoView != null) {
+            holder.videoView.prepare();
         }
     }
 
@@ -191,7 +171,24 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         if (viewHolder instanceof ViewHolder) {
             ViewHolder holder = (ViewHolder) viewHolder;
             Video.Data video = videoList.get(position);
-            loadVideo(holder, video);
+            try {
+                String videoId = video.getVideoId();
+                //不是同一视频执行加载
+                if (!holder.videoId.equals(videoId) || !holder.isInitializeComplete) {
+                    if (!holder.videoId.equals("null")) {
+                        holder.reset();
+                    }
+                    holder.videoId = videoId;
+                    String videoSrc = video.getVideoSrc();
+                    MediaSource videoSource = VideoHttpUtils.getMediaVideoSource(holder.itemView.getContext(), videoSrc);
+                    holder.exoMediaPlayer.setMediaSource(videoSource);
+                    if (holder.videoView != null) {
+                        holder.videoView.prepare();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

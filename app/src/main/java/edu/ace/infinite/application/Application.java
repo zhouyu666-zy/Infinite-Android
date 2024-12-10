@@ -10,6 +10,7 @@ import android.os.Environment;
 
 import com.danikula.videocache.headers.EmptyHeadersInjector;
 import com.danikula.videocache.headers.HeaderInjector;
+import com.orhanobut.hawk.Hawk;
 
 import java.io.File;
 import java.util.HashMap;
@@ -18,6 +19,8 @@ import java.util.Map;
 import edu.ace.infinite.utils.PhoneMessage;
 import edu.ace.infinite.utils.videoCache.HttpProxyCacheServer;
 import edu.ace.infinite.utils.videoCache.file.FileNameGenerator;
+import me.jessyan.autosize.AutoSize;
+import me.jessyan.autosize.AutoSizeConfig;
 
 public class Application extends android.app.Application {
     @SuppressLint("StaticFieldLeak")
@@ -29,13 +32,17 @@ public class Application extends android.app.Application {
 
         context = getApplicationContext();
         PhoneMessage.initMessage(context);
+
+
+        AutoSizeConfig.getInstance().setDesignWidthInDp(392).setDesignHeightInDp(392);
+        //防止头条适配法特殊情况下自启动失败
+        if(!AutoSize.checkInit()){
+            AutoSize.checkAndInit(this);
+        }
+
+        Hawk.init(this).build();
     }
 
-    public static Map<String,String> getLoginMessage() {
-        Map<String,String> map = new HashMap<>();
-//        map.put("userToken","1");
-        return map;
-    }
     //视频缓存
     private HttpProxyCacheServer proxy;
     public static class MyFileNameGenerator implements FileNameGenerator {

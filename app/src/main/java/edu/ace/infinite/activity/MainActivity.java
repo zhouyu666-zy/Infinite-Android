@@ -2,9 +2,11 @@ package edu.ace.infinite.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.GravityCompat;
@@ -12,6 +14,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+
+import com.orhanobut.hawk.Hawk;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -29,6 +33,7 @@ import edu.ace.infinite.fragment.personalfragment.WorksFragment;
 import edu.ace.infinite.utils.ConsoleUtils;
 import edu.ace.infinite.utils.PhoneMessage;
 import edu.ace.infinite.view.CustomViewPager;
+import edu.ace.infinite.view.MyDialog;
 import edu.ace.infinite.view.MyToast;
 import me.ibrahimsn.lib.SmoothBottomBar;
 
@@ -78,6 +83,24 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onDrawerStateChanged(int newState) {
             }
+        });
+
+        //退出登录
+        findViewById(R.id.quit_login).setOnClickListener(view -> {
+            MyDialog myDialog = new MyDialog(this,R.style.MyDialog);
+            myDialog.setTitle("退出登录");
+            myDialog.setThemeColor(getColor(R.color.Theme2));
+            myDialog.setMessage("确定退出登录吗？");
+            myDialog.setYesOnclickListener("确定退出", () -> {
+                myDialog.dismiss();
+                Hawk.delete("loginToken");
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                isReturn = true;
+                finish();
+            });
+            myDialog.setNoOnclickListener("取消退出", myDialog::dismiss);
+            myDialog.show();
         });
     }
 
@@ -164,6 +187,7 @@ public class MainActivity extends BaseActivity {
             view_pager.setCurrentItem(i);
             return false;
         });
+
     }
 
     private int currPage = 0;
@@ -181,9 +205,13 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    private boolean isReturn;
     private long touchTime = 0;
     @Override
     public void finish() {
+        if(isReturn){
+            super.finish();
+        }
         if(isOpenDrawerLayout){
             if(drawerLayout != null){
                 drawerLayout.closeDrawer(GravityCompat.END);

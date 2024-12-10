@@ -9,6 +9,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,6 +41,15 @@ public class MessageFragment extends BaseFragment {
     }
 
     private void initViews() {
+        View titleContainer = findViewById(R.id.titleContainer);
+        if(titleContainer != null){
+            ViewCompat.setOnApplyWindowInsetsListener(titleContainer, (v, insets) -> {
+                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+                return insets;
+            });
+        }
+
         messageListRecyclerView = view.findViewById(R.id.messageListRecyclerView);
         messageListRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         

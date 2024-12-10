@@ -16,6 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.exoplayer2.source.MediaSource;
+import com.orhanobut.hawk.Hawk;
 
 import org.salient.artplayer.exo.ExoMediaPlayer;
 import org.salient.artplayer.exo.ExoSourceBuilder;
@@ -25,59 +26,64 @@ import java.util.Map;
 import edu.ace.infinite.R;
 import edu.ace.infinite.application.Application;
 import edu.ace.infinite.utils.ConsoleUtils;
+import pl.droidsonroids.gif.GifImageView;
 
 public class StartActivity extends BaseActivity {
-    private VideoView videoView;
+//    private VideoView videoView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_start);
         super.onCreate(savedInstanceState);
+        setStatusBarTextColor(true);
 
-        videoView = findViewById(R.id.videoView);
 
-        // 设置视频 URI，使用 R 类中的资源 ID
-        Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.start_page_video);
-        videoView.setVideoURI(videoUri);
+        GifImageView gifImageView = findViewById(R.id.gifImage);
+        gifImageView.setImageResource(R.drawable.start_page_anim);
 
-        // 添加监听器
-        videoView.setOnPreparedListener(mp -> {
-            // 视频准备完成后自动播放
-            videoView.start();
-        });
-        videoView.setOnCompletionListener(mp -> {
-            // 当视频播放完毕时，重新开始播放
-            videoView.start();
-            skip();
-        });
+        skip();
 
-        // 开始准备视频
-        videoView.requestFocus();
+//        videoView = findViewById(R.id.videoView);
+//
+//        // 设置视频 URI，使用 R 类中的资源 ID
+//        Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.start_page_video);
+//        videoView.setVideoURI(videoUri);
+//
+//        // 添加监听器
+//        videoView.setOnPreparedListener(mp -> {
+//            // 视频准备完成后自动播放
+//            videoView.start();
+//        });
+//        videoView.setOnCompletionListener(mp -> {
+//            // 当视频播放完毕时，重新开始播放
+//            videoView.start();
+//            skip();
+//        });
+//
+//        // 开始准备视频
+//        videoView.requestFocus();
 
 
     }
 
     private void skip() {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                Map<String, String> loginMessage = Application.getLoginMessage();
-                Intent intent;
-                String token = loginMessage.get("userToken");
-                if(token == null){
-                    intent = new Intent(StartActivity.this, LoginActivity.class);
-                }else {
-                    intent = new Intent(StartActivity.this, MainActivity.class);
-                }
-                startActivity(intent);
-                finish();
+        new Handler().postDelayed(() -> {
+            Intent intent;
+            String token = Hawk.get("loginToken");
+            if(token == null){
+                intent = new Intent(StartActivity.this, LoginActivity.class);
+            }else {
+                intent = new Intent(StartActivity.this, MainActivity.class);
             }
-        });
+            startActivity(intent);
+            finish();
+
+        },5000);
     }
 
     @Override
     public void finish() {
-        videoView.resume();
+//        videoView.resume();
         super.finish();
     }
 }

@@ -9,14 +9,25 @@
     tools:context=".activity.StartActivity">
 
 
-    <VideoView
-        android:id="@+id/videoView"
+<!--    <VideoView-->
+<!--        android:id="@+id/videoView"-->
+<!--        android:layout_width="300dp"-->
+<!--        android:layout_height="200dp"-->
+<!--        android:layout_marginTop="120dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/gifImage"
         android:layout_width="300dp"
         android:layout_height="200dp"
-        android:layout_marginTop="120dp"
+        android:layout_marginBottom="250dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+    </pl.droidsonroids.gif.GifImageView>
 
 
     <ImageView
@@ -26,7 +37,7 @@
         android:src="@drawable/start_app_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/videoView"
+        app:layout_constraintTop_toBottomOf="@+id/gifImage"
         tools:ignore="HardcodedText" />
 
     <LinearLayout

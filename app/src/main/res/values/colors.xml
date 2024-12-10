@@ -19,6 +19,7 @@
 
     
     <color name="Theme">#18A2FD</color>
+    <color name="Theme2">#FF3C3C</color>
 
     <!--主要底部栏选中底色-->
     <color name="mainBarIndicatorColor">#80E1DCDC</color>

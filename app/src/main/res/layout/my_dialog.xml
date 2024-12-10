@@ -19,7 +19,7 @@
             android:orientation="vertical"
             android:clipChildren="false"
             android:clipToPadding="false"
-            app:view_radius="10dp">
+            app:view_radius="5dp">
             <TextView
                 android:id="@+id/title"
                 android:layout_width="match_parent"
