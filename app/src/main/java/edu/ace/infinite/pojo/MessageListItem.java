@@ -9,15 +9,15 @@ public class MessageListItem {
     private boolean online;
     private int unreadCount;
 
-    public MessageListItem(String userId, String username, String avatar, String lastMessage,
-                           String lastTime, boolean online) {
+    public MessageListItem(String userId, String username, String avatar, 
+                         String lastMessage, String lastTime, boolean online, int unreadCount) {
         this.userId = userId;
         this.username = username;
         this.avatar = avatar;
         this.lastMessage = lastMessage;
         this.lastTime = lastTime;
         this.online = online;
-        this.unreadCount = 0;
+        this.unreadCount = unreadCount;
     }
 
     // Getters and Setters

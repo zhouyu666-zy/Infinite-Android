@@ -30,7 +30,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class VideoHttpUtils {
-    private static String userId = "1";
+    public static String userId = "1";
 //    public final static String IP = "http://192.168.97.202:8181";
     public final static String IP = "http://192.168.64.126:8181";
 //    public final static String IP = "http://172.18.3.217:8181";

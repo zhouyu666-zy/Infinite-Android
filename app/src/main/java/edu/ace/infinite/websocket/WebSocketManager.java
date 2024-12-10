@@ -1,7 +1,13 @@
 package edu.ace.infinite.websocket;
 
+import static edu.ace.infinite.utils.http.VideoHttpUtils.userId;
+
 import android.util.Log;
 import androidx.annotation.NonNull;
+
+import com.google.gson.Gson;
+
+import edu.ace.infinite.websocket.model.ChatMessage;
 import okhttp3.*;
 import java.util.concurrent.TimeUnit;
 
@@ -11,7 +17,7 @@ public class WebSocketManager {
     private WebSocket webSocket;
     private final String wsUrl; // WebSocket服务器地址
     private MessageCallback messageCallback;
-    
+
     public interface MessageCallback {
         void onMessage(String message);
         void onConnected();
@@ -51,6 +57,7 @@ public class WebSocketManager {
             @Override
             public void onOpen(@NonNull WebSocket webSocket, @NonNull Response response) {
                 Log.d(TAG, "WebSocket连接成功");
+                webSocket.send("{\"type\": \"JOIN\", \"senderId\": \"" + userId + "\"}");
                 if (messageCallback != null) {
                     messageCallback.onConnected();
                 }
@@ -59,6 +66,7 @@ public class WebSocketManager {
             @Override
             public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
                 Log.d(TAG, "收到消息: " + text);
+                handleMessage(text);
                 if (messageCallback != null) {
                     messageCallback.onMessage(text);
                 }
@@ -92,5 +100,30 @@ public class WebSocketManager {
         if (webSocket != null) {
             webSocket.close(1000, "正常关闭");
         }
+    }
+
+    private void handleMessage(String message) {
+        // 解析消息并更新UI
+        ChatMessage chatMessage = parseMessage(message);
+        // 根据消息类型进行处理
+        switch (chatMessage.getMessageType()) {
+            case 1: // JOIN
+                // 处理用户加入聊天室
+                break;
+            case 2: // CHAT
+                // 更新UI以显示新消息
+                break;
+            case 3: // PRIVATE
+                if(chatMessage.getReceiverId().equals(userId)) {
+                    // 显示私聊消息
+                }
+                break;
+        }
+    }
+
+    public ChatMessage parseMessage(String jsonMessage) {
+        // 解析JSON字符串为ChatMessage对象
+        Gson gson = new Gson();
+        return gson.fromJson(jsonMessage, ChatMessage.class);
     }
 }
