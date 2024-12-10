@@ -1,13 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/titleContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="#4A888888"
+        android:elevation="4dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/messageTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="@string/message_title"
+            android:textColor="#1565C0"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#90CAF9" />
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messageListRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/titleContainer"
         android:clipToPadding="false"
-        android:padding="8dp"/>
+        android:padding="8dp"
+        android:scrollbars="vertical" />
 
 </RelativeLayout>
