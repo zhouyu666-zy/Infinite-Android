@@ -111,6 +111,7 @@ public class MessageFragment extends BaseFragment {
                     messageListAdapter.notifyDataSetChanged();
                 }
                 if(refreshFollowList){
+                    refreshFollowList = false;
                     loadMessages();
                 }
                 view.postDelayed(this, 500);
