@@ -9,29 +9,14 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.ace.infinite.R;
@@ -287,7 +272,7 @@ public class LoginActivity extends BaseActivity {
                         MyToast.show("登录成功",true);
                         startActivity(new Intent(this, MainActivity.class));
                     }else {
-                        MyToast.show("登录失败",false);
+                        MyToast.show("登录失败，请确认您的账号密码",false);
                     }
                     myProgressDialog.dismiss();
                 });
@@ -329,12 +314,22 @@ public class LoginActivity extends BaseActivity {
             myProgressDialog.show();
             //TODO 处理注册 完成后执行 myProgressDialog.dismiss();
             new Thread(() -> {
-                boolean registerUser = UserHttpUtils.registerUser(username_text, password_text);
+                JSONObject jsonObject = UserHttpUtils.registerUser(username_text, password_text);
+                String message = "注册失败";
+                int code = 500;
+                if(jsonObject != null){
+                    try {
+                        message = jsonObject.getString("message");
+                        code = jsonObject.getInt("code");
+                    } catch (Exception ignored) {}
+                }
+                String finalMessage = message;
+                int finalCode = code;
                 runOnUiThread(() -> {
-                    if(registerUser){
+                    if(finalCode == 200){
                         MyToast.show("注册成功",true);
                     }else {
-                        MyToast.show("注册失败",false);
+                        MyToast.show(finalMessage,false);
                     }
                     myProgressDialog.dismiss();
                 });

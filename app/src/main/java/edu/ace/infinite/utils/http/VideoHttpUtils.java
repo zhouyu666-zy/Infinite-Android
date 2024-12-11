@@ -1,10 +1,9 @@
 package edu.ace.infinite.utils.http;
 
-import static edu.ace.infinite.utils.http.Config.IP;
+import static edu.ace.infinite.utils.http.Config.BaseUrl;
 import static edu.ace.infinite.utils.http.Config.client;
 
 import android.content.Context;
-import android.media.MediaPlayer;
 
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.gson.Gson;
@@ -13,34 +12,27 @@ import com.orhanobut.hawk.Hawk;
 import org.json.JSONObject;
 import org.salient.artplayer.exo.ExoSourceBuilder;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import edu.ace.infinite.pojo.Like;
 import edu.ace.infinite.pojo.Video;
 import edu.ace.infinite.utils.ConsoleUtils;
 import okhttp3.FormBody;
-import okhttp3.Headers;
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class VideoHttpUtils {
-    public static String userId = "1";
 
     /**
      * 获取推荐视频
      */
     public static Video getRecommentVideo(){
-        Request request = new Request.Builder().url(IP + "/api/video/getRecommendList")
+        Request request = new Request.Builder().url(BaseUrl + "/api/video/getRecommendList")
                 .build();
         try {
             String result = client.newCall(request).execute().body().string();
@@ -62,7 +54,7 @@ public class VideoHttpUtils {
     public static boolean likeVideo(boolean isLike,Video.Data video){
         Like like = new Like(video, isLike);
         String json = new Gson().toJson(like);
-        String url = IP;
+        String url = BaseUrl;
         if(isLike){
             url += "/api/video/like";
         }else {
@@ -91,7 +83,7 @@ public class VideoHttpUtils {
         String token = Hawk.get("loginToken");
         FormBody.Builder formBody = new FormBody.Builder();
         formBody.add("userId", token);
-        Request request = new Request.Builder().url(IP + "/api/video/getLikeList")
+        Request request = new Request.Builder().url(BaseUrl + "/api/video/getLikeList")
                 .addHeader("token", token)
                 .post(formBody.build())
                 .build();

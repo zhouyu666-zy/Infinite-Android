@@ -1,36 +1,49 @@
 package edu.ace.infinite.adapter;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import edu.ace.infinite.R;
-import edu.ace.infinite.websocket.model.ChatMessage;
+import edu.ace.infinite.pojo.ChatMessage;
+import edu.ace.infinite.utils.TimeUtils;
 
 import java.util.List;
 
-public class                                                                                                                                                                                                                                                              MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
+public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
     private List<ChatMessage> messages;
+    private String currentUserId;
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
-        public ImageView imageViewAvatar;
-        public TextView textViewNickname;
-        public TextView textViewMessagePreview;
+        public ImageView avatarImage;
+        public TextView nickname;
+        public TextView message_content;
+        public TextView sendTime;
+        public LinearLayout message_content_layout;
 
         public MessageViewHolder(View itemView) {
             super(itemView);
-            imageViewAvatar = itemView.findViewById(R.id.imageView_avatar);
-            textViewNickname = itemView.findViewById(R.id.textView_nickname);
-            textViewMessagePreview = itemView.findViewById(R.id.textView_message_preview);
+            avatarImage = itemView.findViewById(R.id.avatar_image);
+            nickname = itemView.findViewById(R.id.nickname);
+            message_content = itemView.findViewById(R.id.message_content);
+            sendTime = itemView.findViewById(R.id.sendTime);
+
+            message_content_layout = itemView.findViewById(R.id.message_content_layout);
         }
     }
 
-    public MessageAdapter(List<ChatMessage> messages) {
+
+    public MessageAdapter(List<ChatMessage> messages,String currentUserId) {
         this.messages = messages;
+        this.currentUserId = currentUserId;
     }
 
     @Override
@@ -41,8 +54,26 @@ public class                                                                    
 
     @Override
     public void onBindViewHolder(MessageViewHolder holder, int position) {
-        // 这里可以根据需要加载头像图片，例如使用Glide或Picasso
+        ChatMessage chatMessage = messages.get(position);
+        holder.message_content.setText(chatMessage.getContent());
+        holder.nickname.setText(chatMessage.getSenderName());
+        holder.sendTime.setText(TimeUtils.friendlyTime(chatMessage.getTimestamp()));
 
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarImage.getLayoutParams();
+        if (currentUserId.equals(chatMessage.getSenderId())) {
+            // 当前用户发送的消息，显示在右边
+            layoutParams.removeRule(RelativeLayout.ALIGN_PARENT_START);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
+            holder.message_content_layout.setGravity(Gravity.END);
+//            holder.message_content.setBackgroundResource(R.drawable.bubble_right);
+        } else {
+            // 其他用户发送的消息，显示在左边
+            layoutParams.removeRule(RelativeLayout.ALIGN_PARENT_END);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_START);
+            holder.message_content_layout.setGravity(Gravity.START);
+//            holder.message_content.setBackgroundResource(R.drawable.bubble_left);
+        }
+        holder.avatarImage.setLayoutParams(layoutParams);
     }
 
     @Override

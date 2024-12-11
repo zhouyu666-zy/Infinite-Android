@@ -1,22 +1,26 @@
-package edu.ace.infinite.websocket;
-
-import static edu.ace.infinite.utils.http.VideoHttpUtils.userId;
+package edu.ace.infinite.application;
 
 import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
+import com.orhanobut.hawk.Hawk;
 
-import edu.ace.infinite.websocket.model.ChatMessage;
+import edu.ace.infinite.utils.ConsoleUtils;
+import edu.ace.infinite.utils.http.Config;
+import edu.ace.infinite.pojo.ChatMessage;
 import okhttp3.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class WebSocketManager {
     private static final String TAG = "WebSocketManager";
     private static WebSocketManager instance;
     private WebSocket webSocket;
-    private final String wsUrl; // WebSocket服务器地址
-    private MessageCallback messageCallback;
+    private final String wsUrl = "ws://"+ Config.IP +"/message"; // WebSocket服务器地址
+    private List<MessageCallback> messageCallbacks = new ArrayList<>();
 
     public interface MessageCallback {
         void onMessage(String message);
@@ -25,23 +29,20 @@ public class WebSocketManager {
         void onError(String error);
     }
 
-    private WebSocketManager(String url) {
-        this.wsUrl = url;
-    }
+    private WebSocketManager() {}
 
-    public static WebSocketManager getInstance(String url) {
+    public static WebSocketManager getInstance() {
         if (instance == null) {
-            synchronized (WebSocketManager.class) {
-                if (instance == null) {
-                    instance = new WebSocketManager(url);
-                }
-            }
+            instance = new WebSocketManager();
         }
         return instance;
     }
 
     public void setMessageCallback(MessageCallback callback) {
-        this.messageCallback = callback;
+        this.messageCallbacks.add(callback);
+    }
+    public void removeMessageCallback(MessageCallback callback) {
+        this.messageCallbacks.remove(callback);
     }
 
     public void connect() {
@@ -49,42 +50,50 @@ public class WebSocketManager {
                 .pingInterval(30, TimeUnit.SECONDS)
                 .build();
 
+        String token = Hawk.get("loginToken");
+
         Request request = new Request.Builder()
-                .url(wsUrl)
+                .url(wsUrl+"?token=" + token)
                 .build();
 
         webSocket = client.newWebSocket(request, new WebSocketListener() {
             @Override
             public void onOpen(@NonNull WebSocket webSocket, @NonNull Response response) {
-                Log.d(TAG, "WebSocket连接成功");
-                webSocket.send("{\"type\": \"JOIN\", \"senderId\": \"" + userId + "\"}");
-                if (messageCallback != null) {
-                    messageCallback.onConnected();
+                ConsoleUtils.logErr("WebSocket连接成功");
+                for (MessageCallback messageCallback : messageCallbacks) {
+                    if (messageCallback != null) {
+                        messageCallback.onConnected();
+                    }
                 }
             }
-
             @Override
             public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
                 Log.d(TAG, "收到消息: " + text);
                 handleMessage(text);
-                if (messageCallback != null) {
-                    messageCallback.onMessage(text);
+                for (MessageCallback messageCallback : messageCallbacks) {
+                    if (messageCallback != null) {
+                        messageCallback.onMessage(text);
+                    }
                 }
             }
 
             @Override
             public void onClosing(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
                 webSocket.close(1000, null);
-                if (messageCallback != null) {
-                    messageCallback.onDisconnected();
+                for (MessageCallback messageCallback : messageCallbacks) {
+                    if (messageCallback != null) {
+                        messageCallback.onDisconnected();
+                    }
                 }
             }
 
             @Override
             public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, Response response) {
                 Log.e(TAG, "WebSocket连接失败", t);
-                if (messageCallback != null) {
-                    messageCallback.onError(t.getMessage());
+                for (MessageCallback messageCallback : messageCallbacks) {
+                    if (messageCallback != null) {
+                        messageCallback.onError(t.getMessage());
+                    }
                 }
             }
         });
@@ -103,6 +112,9 @@ public class WebSocketManager {
     }
 
     private void handleMessage(String message) {
+
+        ConsoleUtils.logErr(message);
+
         // 解析消息并更新UI
         ChatMessage chatMessage = parseMessage(message);
         // 根据消息类型进行处理
@@ -114,9 +126,9 @@ public class WebSocketManager {
                 // 更新UI以显示新消息
                 break;
             case 3: // PRIVATE
-                if(chatMessage.getReceiverId().equals(userId)) {
-                    // 显示私聊消息
-                }
+//                if(chatMessage.getReceiverId().equals(userId)) {
+//                    // 显示私聊消息
+//                }
                 break;
         }
     }

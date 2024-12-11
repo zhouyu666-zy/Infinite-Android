@@ -1,4 +1,4 @@
-package edu.ace.infinite.websocket.model;
+package edu.ace.infinite.pojo;
 
 public class ChatMessage {
     private String messageId;

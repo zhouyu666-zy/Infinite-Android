@@ -2,7 +2,6 @@ package edu.ace.infinite.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -18,11 +17,14 @@ import androidx.viewpager.widget.ViewPager;
 import com.orhanobut.hawk.Hawk;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.ace.infinite.R;
+import edu.ace.infinite.adapter.MessageAdapter;
 import edu.ace.infinite.adapter.VideoAdapter;
 import edu.ace.infinite.fragment.MessageFragment;
 import edu.ace.infinite.fragment.PersonalFragment;
@@ -30,11 +32,15 @@ import edu.ace.infinite.fragment.RecommendVideoFragment;
 import edu.ace.infinite.fragment.personalfragment.FavoritesFragment;
 import edu.ace.infinite.fragment.personalfragment.LikesFragment;
 import edu.ace.infinite.fragment.personalfragment.WorksFragment;
+import edu.ace.infinite.pojo.ChatMessage;
+import edu.ace.infinite.pojo.MessageListItem;
 import edu.ace.infinite.utils.ConsoleUtils;
 import edu.ace.infinite.utils.PhoneMessage;
+import edu.ace.infinite.utils.TimeUtils;
 import edu.ace.infinite.view.CustomViewPager;
 import edu.ace.infinite.view.MyDialog;
 import edu.ace.infinite.view.MyToast;
+import edu.ace.infinite.application.WebSocketManager;
 import me.ibrahimsn.lib.SmoothBottomBar;
 
 public class MainActivity extends BaseActivity {
@@ -49,10 +55,62 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
         super.onCreate(savedInstanceState);
-
-
         initView();
         initDrawerLayout();
+        connectWebSocket();
+    }
+
+    private void connectWebSocket() {
+        String token = Hawk.get("loginToken");
+        WebSocketManager.getInstance().setMessageCallback(new WebSocketManager.MessageCallback() {
+            @Override
+            public void onMessage(String message) {
+                runOnUiThread(() -> MyToast.show("收到消息："+message));
+                try {
+                    JSONObject jsonObject = new JSONObject(message);
+                    String senderId = jsonObject.getString("senderId");
+                    List<MessageListItem> messageList = MessageFragment.getMessageList();
+                    for (MessageListItem messageListItem : messageList) {
+                        String userId = messageListItem.getUserId();
+                        ConsoleUtils.logErr(userId+":"+senderId);
+                        if (userId.trim().equals(senderId.trim())) {
+                            JSONObject userInfo = jsonObject.getJSONObject("userInfo");
+                            String nickname = userInfo.getString("nickname");
+                            String content = jsonObject.getString("content");
+                            messageListItem.setLastMessage(content);
+                            messageListItem.setLastTime(TimeUtils.friendlyTime(System.currentTimeMillis()));
+                            messageListItem.setUnreadCount(messageListItem.getUnreadCount()+1);
+
+                            List<ChatMessage> chatMessageList = messageListItem.getChatMessageList();
+                            ChatMessage chatMessage = new ChatMessage(senderId, nickname,
+                                    token, content, 1);
+                            chatMessageList.add(chatMessage);
+                            MessageFragment.refreshList = true;
+//                            String username = messageListItem.getUsername();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onConnected() {
+
+            }
+
+            @Override
+            public void onDisconnected() {
+
+            }
+
+            @Override
+            public void onError(String error) {
+                runOnUiThread(() ->
+                        MyToast.show("错误: " + error));
+            }
+        });
+        WebSocketManager.getInstance().connect();
     }
 
     private void initDrawerLayout() {
@@ -94,6 +152,7 @@ public class MainActivity extends BaseActivity {
             myDialog.setYesOnclickListener("确定退出", () -> {
                 myDialog.dismiss();
                 Hawk.delete("loginToken");
+                WebSocketManager.getInstance().disconnect(); //退出登录关闭连接
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
                 isReturn = true;
@@ -146,6 +205,7 @@ public class MainActivity extends BaseActivity {
                     case 1:
                         smoothBottomBar.setBarBackgroundColor(getColor(R.color.white));
                         cutOffLineView.setBackgroundColor(getColor(R.color.cutOffLine));
+                        MessageFragment.refreshList = true;
                         break;
                     case 2:
                         smoothBottomBar.setBarBackgroundColor(getColor(R.color.white));

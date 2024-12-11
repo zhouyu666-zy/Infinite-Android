@@ -1,5 +1,13 @@
 package edu.ace.infinite.pojo;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import edu.ace.infinite.utils.ConsoleUtils;
+import edu.ace.infinite.utils.TimeUtils;
+
 public class MessageListItem {
     private String userId;
     private String username;
@@ -9,15 +17,38 @@ public class MessageListItem {
     private boolean online;
     private int unreadCount;
 
-    public MessageListItem(String userId, String username, String avatar, 
-                         String lastMessage, String lastTime, boolean online, int unreadCount) {
-        this.userId = userId;
-        this.username = username;
-        this.avatar = avatar;
-        this.lastMessage = lastMessage;
-        this.lastTime = lastTime;
-        this.online = online;
-        this.unreadCount = unreadCount;
+    private List<ChatMessage> chatMessageList;
+
+    public MessageListItem() {
+//        this.userId = userId;
+//        this.username = username;
+//        this.avatar = avatar;
+//        this.lastMessage = lastMessage;
+//        this.lastTime = lastTime;
+//        this.online = online;
+//        this.unreadCount = unreadCount;
+    }
+
+    public static MessageListItem userToMessageItem(User user,String myId){
+        MessageListItem message = new MessageListItem();
+        long followTime = user.getFollowTime() - 1000L;
+        message.setUserId(String.valueOf(user.getId()));
+        message.setAvatar(user.getAvatar());
+        message.setLastMessage("感谢您的关注！");
+        message.setLastTime(TimeUtils.friendlyTime(followTime));
+        message.setOnline(true);
+        message.setUnreadCount(1);
+        message.setUsername(user.getNickname());
+        message.chatMessageList = new ArrayList<>();
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setContent("感谢您的关注！");
+        chatMessage.setMessageType(1);
+        chatMessage.setSenderId(String.valueOf(user.getId()));
+        chatMessage.setSenderName(user.getNickname());
+        chatMessage.setReceiverId(myId);
+        chatMessage.setTimestamp(followTime);
+        message.chatMessageList.add(chatMessage);
+        return message;
     }
 
     // Getters and Setters
@@ -41,4 +72,15 @@ public class MessageListItem {
 
     public int getUnreadCount() { return unreadCount; }
     public void setUnreadCount(int unreadCount) { this.unreadCount = unreadCount; }
+
+    public List<ChatMessage> getChatMessageList() {
+        if(chatMessageList == null){
+            chatMessageList = new ArrayList<>();
+        }
+        return chatMessageList;
+    }
+
+    public void setChatMessageList(List<ChatMessage> chatMessageList) {
+        this.chatMessageList = chatMessageList;
+    }
 }

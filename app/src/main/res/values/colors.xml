@@ -76,4 +76,6 @@
     <color name="video_theme">#ffffff</color>
     <color name="colorPrimary">#6200EE</color> <!-- 默认背景颜色 -->
     <color name="colorAccent">#FF4081</color> <!-- 聚焦时的背景颜色 -->
+    <color name="follow_color">#3AA8FF</color> <!-- 蓝色 -->
+    <color name="unfollow_color">#FF6054</color> <!-- 红色 -->
 </resources>

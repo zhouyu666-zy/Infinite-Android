@@ -1,6 +1,8 @@
 package edu.ace.infinite.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,27 +11,20 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import edu.ace.infinite.R;
+import edu.ace.infinite.activity.ChatActivity;
 import edu.ace.infinite.pojo.MessageListItem;
-import edu.ace.infinite.websocket.model.ChatMessage;
+
 import java.util.List;
 
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.ViewHolder> {
     private List<MessageListItem> messageList;
     private Context context;
-    private OnItemClickListener listener;
-
-    public interface OnItemClickListener {
-        void onItemClick(MessageListItem item);
-    }
 
     public MessageListAdapter(Context context, List<MessageListItem> messageList) {
         this.context = context;
         this.messageList = messageList;
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
-    }
 
     @NonNull
     @Override
@@ -39,6 +34,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         return new ViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         MessageListItem item = messageList.get(position);
@@ -49,18 +45,27 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         // 设置在线状态
         holder.onlineIndicator.setVisibility(item.isOnline() ? View.VISIBLE : View.GONE);
 
+        int unreadCount = item.getUnreadCount();
         // 设置未读消息数
-        if (item.getUnreadCount() > 0) {
+        if (unreadCount > 0) {
             holder.unreadCountText.setVisibility(View.VISIBLE);
-            holder.unreadCountText.setText(String.valueOf(item.getUnreadCount()));
+            if(unreadCount > 99){
+                holder.unreadCountText.setText("99+");
+            }else {
+                holder.unreadCountText.setText(String.valueOf(unreadCount));
+            }
         } else {
             holder.unreadCountText.setVisibility(View.GONE);
         }
 
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onItemClick(item);
-            }
+            //跳转到聊天界面
+            Intent intent = new Intent(context, ChatActivity.class);
+            intent.putExtra("userId", item.getUserId());
+            intent.putExtra("username", item.getUsername());
+            intent.putExtra("avatar", item.getAvatar());
+            ChatActivity.messageListItem = item;
+            context.startActivity(intent);
         });
     }
 

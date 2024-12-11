@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".activity.SearchActivity">
+
+
+    <RelativeLayout
+        android:id="@+id/frame"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/view_semicircle"
+        android:orientation="horizontal"
+        android:backgroundTint="@color/themeColor"
+        android:layout_centerHorizontal="true"
+        app:layout_constraintTop_toTopOf="parent"
+        android:transitionName="searchView">
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/search_icon"
+            android:layout_marginStart="15dp"
+            android:layout_centerVertical="true"/>
+
+        <EditText
+            android:id="@+id/search_input"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="45dp"
+            android:background="@drawable/view_semicircle"
+            android:hint="搜索用户"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:paddingRight="40dp"
+            android:backgroundTint="@color/themeColor"
+            android:textColor="@color/textGeneral"
+            android:textColorHint="@color/textTinge"
+            android:textCursorDrawable="@drawable/input_gb"
+            android:textSize="15dp" />
+
+<!--        <LinearLayout-->
+<!--            android:id="@+id/remove_all_keyword"-->
+<!--            android:layout_width="30dp"-->
+<!--            android:layout_height="30dp"-->
+<!--            android:gravity="center"-->
+<!--            android:layout_alignParentRight="true"-->
+<!--            android:layout_marginEnd="5dp"-->
+<!--            android:visibility="gone">-->
+<!--            <ImageView-->
+<!--                android:layout_width="15dp"-->
+<!--                android:layout_height="15dp"-->
+<!--                android:src="@drawable/remove_icon" />-->
+<!--        </LinearLayout>-->
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/frame">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
