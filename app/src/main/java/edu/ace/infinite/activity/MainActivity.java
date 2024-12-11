@@ -1,6 +1,10 @@
 package edu.ace.infinite.activity;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -35,6 +41,7 @@ import edu.ace.infinite.fragment.personalfragment.WorksFragment;
 import edu.ace.infinite.pojo.ChatMessage;
 import edu.ace.infinite.pojo.MessageListItem;
 import edu.ace.infinite.utils.ConsoleUtils;
+import edu.ace.infinite.utils.NotificationHelper;
 import edu.ace.infinite.utils.PhoneMessage;
 import edu.ace.infinite.utils.TimeUtils;
 import edu.ace.infinite.view.CustomViewPager;
@@ -58,6 +65,15 @@ public class MainActivity extends BaseActivity {
         initView();
         initDrawerLayout();
         connectWebSocket();
+
+//        XXPermissions.with(this)
+//                .permission(Permission.NOTIFICATION_SERVICE)
+//                .request((permissions, all) -> {
+//                    if (all) {
+//                        Bitmap avatar = BitmapFactory.decodeResource(getResources(), R.drawable.person);
+//                        createMessageNotification("Alice", "Hello, how are you?", "Just now", avatar);
+//                    }
+//                });
     }
 
     private void connectWebSocket() {
@@ -69,10 +85,11 @@ public class MainActivity extends BaseActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(message);
                     String senderId = jsonObject.getString("senderId");
+//                    long timestamp = jsonObject.getLong("timestamp");
                     List<MessageListItem> messageList = MessageFragment.getMessageList();
+                    boolean isExist = false;
                     for (MessageListItem messageListItem : messageList) {
                         String userId = messageListItem.getUserId();
-                        ConsoleUtils.logErr(userId+":"+senderId);
                         if (userId.trim().equals(senderId.trim())) {
                             JSONObject userInfo = jsonObject.getJSONObject("userInfo");
                             String nickname = userInfo.getString("nickname");
@@ -85,10 +102,40 @@ public class MainActivity extends BaseActivity {
                             ChatMessage chatMessage = new ChatMessage(senderId, nickname,
                                     token, content, 1);
                             chatMessageList.add(chatMessage);
-                            MessageFragment.refreshList = true;
-//                            String username = messageListItem.getUsername();
+                            isExist = true;
+                            break;
                         }
                     }
+                    //如不存在聊天记录，则添加到聊天中
+                    if(!isExist){
+                        JSONObject userInfo = jsonObject.getJSONObject("userInfo");
+                        String content = jsonObject.getString("content");
+                        String nickname = userInfo.getString("nickname");
+                        long currentTimeMillis = System.currentTimeMillis();
+                        String avatar = userInfo.getString("avatar");
+                        int id = userInfo.getInt("id");
+                        MessageListItem messageListItem = new MessageListItem();
+                        messageListItem.setUserId(String.valueOf(id));
+                        messageListItem.setAvatar(avatar);
+                        messageListItem.setLastMessage(content);
+                        messageListItem.setLastTime(TimeUtils.friendlyTime(currentTimeMillis));
+                        messageListItem.setOnline(true);
+                        messageListItem.setUnreadCount(1);
+                        messageListItem.setUsername(nickname);
+                        ArrayList<ChatMessage> chatMessages = new ArrayList<>();
+                        ChatMessage chatMessage = new ChatMessage();
+                        chatMessage.setContent(content);
+                        chatMessage.setMessageType(1);
+                        chatMessage.setSenderAvatar(avatar);
+                        chatMessage.setSenderId(String.valueOf(id));
+                        chatMessage.setSenderName(nickname);
+                        chatMessage.setReceiverId(token);
+                        chatMessage.setTimestamp(currentTimeMillis);
+                        chatMessages.add(chatMessage);
+                        messageListItem.setChatMessageList(chatMessages);
+                        messageList.add(messageListItem);
+                    }
+                    MessageFragment.refreshList = true;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -111,6 +158,10 @@ public class MainActivity extends BaseActivity {
             }
         });
         WebSocketManager.getInstance().connect();
+    }
+
+    private void createMessageNotification(String nickname, String message, String time, Bitmap avatar) {
+        NotificationHelper.createMessageNotification(this, nickname, message, time, avatar);
     }
 
     private void initDrawerLayout() {

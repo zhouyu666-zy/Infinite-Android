@@ -12,9 +12,9 @@ public class TimeUtils {
         }
         long now = System.currentTimeMillis();
         long diff = now - timestamp;
-        if (diff < 0) {
-            return "未知时间";
-        }
+//        if (diff < 0) {
+//            return "未知时间";
+//        }
 
         long diffSeconds = diff / 1000;
         long diffMinutes = diff / (60 * 1000);

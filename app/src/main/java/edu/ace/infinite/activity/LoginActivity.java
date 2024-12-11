@@ -135,14 +135,22 @@ public class LoginActivity extends BaseActivity {
             password.setTypeface(Typeface.DEFAULT);
         });
 
-        login_change_btn.setOnClickListener(v -> {
-            register_view.setVisibility(View.VISIBLE);
-            login_view.setVisibility(View.GONE);
-            registerInitView();
-            isLogin = false;
-        });
+        login_change_btn.setOnClickListener(v -> skipRegister());
 
         login_btn.setOnClickListener(v -> verify());
+    }
+
+    private void skipRegister() {
+        register_view.setVisibility(View.VISIBLE);
+        login_view.setVisibility(View.GONE);
+        registerInitView();
+        isLogin = false;
+    }
+    private void skipLogin() {
+        register_view.setVisibility(View.GONE);
+        login_view.setVisibility(View.VISIBLE);
+        loginInitView();
+        isLogin = true;
     }
 
     /**
@@ -218,12 +226,7 @@ public class LoginActivity extends BaseActivity {
             password_register_second.setTypeface(Typeface.DEFAULT);
         });
 
-        register_change_btn.setOnClickListener(v -> {
-            register_view.setVisibility(View.GONE);
-            login_view.setVisibility(View.VISIBLE);
-            loginInitView();
-            isLogin = true;
-        });
+        register_change_btn.setOnClickListener(v -> skipLogin());
 
         //生成验证码
         Bitmap verification_code_bitmap = verificationCode.createBitmap();
@@ -236,6 +239,8 @@ public class LoginActivity extends BaseActivity {
         });
         register_btn.setOnClickListener(v -> verify());
     }
+
+
 
     private void verify(){
         if(isLogin){
@@ -327,6 +332,7 @@ public class LoginActivity extends BaseActivity {
                 int finalCode = code;
                 runOnUiThread(() -> {
                     if(finalCode == 200){
+                        skipLogin(); //跳转登录页面
                         MyToast.show("注册成功",true);
                     }else {
                         MyToast.show(finalMessage,false);

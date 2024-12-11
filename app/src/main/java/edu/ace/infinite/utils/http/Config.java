@@ -11,10 +11,7 @@ public class Config {
     //    public final static String IP = "http://172.18.3.217:8181";
 
     public static OkHttpClient client = new OkHttpClient()
-            .newBuilder().connectTimeout(5000, TimeUnit.MILLISECONDS)
-            .followRedirects(true) // 默认为 true
-            .followSslRedirects(true) // 默认为 true
-            .retryOnConnectionFailure(true) // 默认为 true
-            .readTimeout(6000, TimeUnit.MILLISECONDS).build();
+            .newBuilder().connectTimeout(50000, TimeUnit.MILLISECONDS)
+            .readTimeout(60000, TimeUnit.MILLISECONDS).build();
 
 }

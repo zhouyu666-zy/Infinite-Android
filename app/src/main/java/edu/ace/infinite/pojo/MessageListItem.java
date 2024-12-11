@@ -43,6 +43,7 @@ public class MessageListItem {
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setContent("感谢您的关注！");
         chatMessage.setMessageType(1);
+        chatMessage.setSenderAvatar(user.getAvatar());
         chatMessage.setSenderId(String.valueOf(user.getId()));
         chatMessage.setSenderName(user.getNickname());
         chatMessage.setReceiverId(myId);
