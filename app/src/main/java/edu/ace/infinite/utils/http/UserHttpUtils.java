@@ -66,6 +66,29 @@ public class UserHttpUtils {
         }
         return null;
     }
+    /**
+     * 搜索用户信息
+     */
+    public static User getUserInfo() {
+        String token = Hawk.get("loginToken");
+        Request request = new Request.Builder().url(Config.BaseUrl + "/user/getUserInfo")
+                .addHeader("token", token)
+                .get()
+                .build();
+        try {
+            String result = Objects.requireNonNull(Config.client.newCall(request).execute().body()).string();
+            JSONObject jsonObject = new JSONObject(result);
+            int code = jsonObject.getInt("code");
+            if (code == 200) {
+                User user = new Gson().fromJson(jsonObject.getJSONObject("data").toString(), User.class);
+                return user;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     public static List<User> searchUser(String keyword) {
         String token = Hawk.get("loginToken");

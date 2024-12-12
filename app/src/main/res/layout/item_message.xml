@@ -10,8 +10,8 @@
     <ImageView
         android:layout_alignParentEnd="true"
         android:id="@+id/avatar_image"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:src="@drawable/person" />
 
     <LinearLayout
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:text="昵称"
             android:textStyle="bold"
-            android:textSize="16sp"
+            android:textSize="12sp"
             app:layout_constraintStart_toEndOf="@id/avatar_image"
             app:layout_constraintTop_toTopOf="@id/avatar_image"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -37,9 +37,15 @@
             android:id="@+id/message_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="消息预览内容"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"/>
+            android:text="发送消息"
+            android:paddingTop="10dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="10dp"
+            android:textColor="#fff"
+            android:textSize="18sp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/message_bg_blue_me"/>
 
         <TextView
             android:id="@+id/sendTime"

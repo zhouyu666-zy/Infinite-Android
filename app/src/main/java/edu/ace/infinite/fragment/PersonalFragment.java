@@ -1,5 +1,8 @@
 package edu.ace.infinite.fragment;
 
+import static android.content.ContentValues.TAG;
+
+import android.annotation.SuppressLint;
 import static edu.ace.infinite.activity.CropImageActivity.CroppedImageBitmap;
 
 import android.content.Context;
@@ -23,6 +26,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.provider.OpenableColumns;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -45,12 +49,16 @@ import com.huantansheng.easyphotos.models.album.entity.Photo;
 
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import edu.ace.infinite.R;
 import edu.ace.infinite.activity.CropImageActivity;
 import edu.ace.infinite.activity.MainActivity;
 import edu.ace.infinite.fragment.personalfragment.FavoritesFragment;
 import edu.ace.infinite.fragment.personalfragment.LikesFragment;
 import edu.ace.infinite.fragment.personalfragment.WorksFragment;
+import edu.ace.infinite.pojo.User;
 import edu.ace.infinite.utils.ConsoleUtils;
 import edu.ace.infinite.utils.GlideEngine;
 import edu.ace.infinite.utils.PhoneMessage;
@@ -58,11 +66,14 @@ import edu.ace.infinite.utils.http.UserHttpUtils;
 import edu.ace.infinite.view.MyDialog;
 import edu.ace.infinite.view.MyProgressDialog;
 import edu.ace.infinite.view.MyToast;
+import edu.ace.infinite.utils.http.Config;
+import edu.ace.infinite.utils.http.UserHttpUtils;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class PersonalFragment extends BaseFragment {
+    private static final Logger log = LoggerFactory.getLogger(PersonalFragment.class);
     private ImageView ivAvatar;
-    private TextView tvUsername, tvUserId, tvFollows, tvFollowing, tvIntro;
+    private TextView tvUsername, tvFollows, tvFollowing, tvIntro;
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
     private ImageView backgroundImage;
@@ -133,7 +144,6 @@ public class PersonalFragment extends BaseFragment {
     private void initViews() {
         ivAvatar = findViewById(R.id.iv_avatar);
         tvUsername = findViewById(R.id.tv_username);
-        tvUserId = findViewById(R.id.tv_userid);
         tvIntro = findViewById(R.id.tv_intro);
         tvFollows = findViewById(R.id.tv_followers);
         tvFollowing = findViewById(R.id.tv_following);
@@ -220,16 +230,31 @@ public class PersonalFragment extends BaseFragment {
         ).attach();
     }
 
-
     private void initUserInfo() {
-        // 这里应该从服务器或本地数据库获取用户信息
-        // 以下是示例数据
-        ivAvatar.setImageResource(R.drawable.logo);
-        tvUsername.setText("JAY-Chou-jay");
-        tvUserId.setText("抖音号：41963388141");
-        tvFollows.setText("218 关注");
-        tvFollowing.setText("15 粉丝");
-        tvIntro.setText("点击添加介绍，让大家认识你...");
+        // 从服务器获取用户信息
+        new Thread(new Runnable() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void run() {
+                User user = UserHttpUtils.getUserInfo();
+                Log.e(TAG, "run: "+user.getNickname());
+               if(user != null){
+                   getActivity().runOnUiThread(() -> {
+                       String s = Config.BaseUrl + user.getAvatar();
+                       Log.e(TAG, "run: "+s );
+                       Glide.with(getActivity()).load(s).into(ivAvatar);
+                       tvUsername.setText(user.getNickname());
+                       tvFollows.setText("关注：" + user.getFollowCount() + "");
+                       tvFollowing.setText("粉丝：" + user.getFansCount() + "");
+                       if (user.getIntro() == null) {
+                           user.setIntro("这个家伙很懒什么也没有写……");
+                       } else {
+                           tvIntro.setText(user.getIntro());
+                       }
+                   });
+               }
+            }
+        }).start();
     }
 
     public static final int IMAGE_RETURN_CODE = 102; //图片选择返回码

@@ -11,6 +11,33 @@ public class User {
     private String upass;
     private Long updateTime;
     private Long followTime;
+    private String intro;
+    private Integer followCount;
+    private Integer fansCount;
+
+    public Integer getFollowCount() {
+        return followCount;
+    }
+
+    public void setFollowCount(Integer followCount) {
+        this.followCount = followCount;
+    }
+
+    public Integer getFansCount() {
+        return fansCount;
+    }
+
+    public void setFansCount(Integer fansCount) {
+        this.fansCount = fansCount;
+    }
+
+    public String getIntro() {
+        return intro;
+    }
+
+    public void setIntro(String intro) {
+        this.intro = intro;
+    }
 
     public String getAvatar() {
         return avatar;

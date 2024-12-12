@@ -65,14 +65,6 @@
                         android:textSize="17sp"
                         android:textStyle="bold" />
 
-                    <!-- 用户ID -->
-                    <TextView
-                        android:id="@+id/tv_userid"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="UserID"
-                        android:textSize="12sp"
-                        android:textColor="@color/white" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -139,7 +131,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:text="点击添加介绍，让大家认识你"
+                android:text="这个家伙很懒什么也没有写……"
                 android:textSize="13sp"
                 android:textColor="@color/textTinge" />
 
