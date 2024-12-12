@@ -11,6 +11,8 @@ import android.os.Environment;
 import com.danikula.videocache.headers.EmptyHeadersInjector;
 import com.danikula.videocache.headers.HeaderInjector;
 import com.orhanobut.hawk.Hawk;
+import com.orhanobut.hawk.HawkBuilder;
+import com.orhanobut.hawk.LogLevel;
 
 import java.io.File;
 import java.util.HashMap;
@@ -25,6 +27,7 @@ import me.jessyan.autosize.AutoSizeConfig;
 public class Application extends android.app.Application {
     @SuppressLint("StaticFieldLeak")
     public static Context context;
+    public static int appAlive = -1; //判断app是否被后台杀掉(初始为-1，进入app后为1)
 
     @Override
     public void onCreate() {
@@ -40,7 +43,12 @@ public class Application extends android.app.Application {
             AutoSize.checkAndInit(this);
         }
 
-        Hawk.init(this).build();
+//        Hawk.init(this).build();
+        Hawk.init(this)
+                .setEncryptionMethod(HawkBuilder.EncryptionMethod.MEDIUM)
+                .setStorage(HawkBuilder.newSqliteStorage(this))
+                .setLogLevel(LogLevel.FULL)
+                .build();
     }
 
     //视频缓存

@@ -1,36 +1,38 @@
 package edu.ace.infinite.activity;
 
+import static edu.ace.infinite.activity.CropImageActivity.CroppedImageBitmap;
+import static edu.ace.infinite.fragment.PersonalFragment.IMAGE_RETURN_CODE;
+import static edu.ace.infinite.fragment.PersonalFragment.RESIZE_REQUEST_CODE;
+
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.huantansheng.easyphotos.EasyPhotos;
+import com.huantansheng.easyphotos.models.album.entity.Photo;
 import com.orhanobut.hawk.Hawk;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.ace.infinite.R;
-import edu.ace.infinite.adapter.MessageAdapter;
 import edu.ace.infinite.adapter.VideoAdapter;
 import edu.ace.infinite.fragment.MessageFragment;
 import edu.ace.infinite.fragment.PersonalFragment;
@@ -41,11 +43,13 @@ import edu.ace.infinite.fragment.personalfragment.WorksFragment;
 import edu.ace.infinite.pojo.ChatMessage;
 import edu.ace.infinite.pojo.MessageListItem;
 import edu.ace.infinite.utils.ConsoleUtils;
+import edu.ace.infinite.utils.MessageList;
 import edu.ace.infinite.utils.NotificationHelper;
 import edu.ace.infinite.utils.PhoneMessage;
 import edu.ace.infinite.utils.TimeUtils;
 import edu.ace.infinite.view.CustomViewPager;
 import edu.ace.infinite.view.MyDialog;
+import edu.ace.infinite.view.MyProgressDialog;
 import edu.ace.infinite.view.MyToast;
 import edu.ace.infinite.application.WebSocketManager;
 import me.ibrahimsn.lib.SmoothBottomBar;
@@ -58,6 +62,7 @@ public class MainActivity extends BaseActivity {
     private DrawerLayout drawerLayout;
     private boolean isOpenDrawerLayout;
 
+    public final static String OPEN_CHAT_ACTIVITY = "OPEN_CHAT_ACTIVITY";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
@@ -66,38 +71,50 @@ public class MainActivity extends BaseActivity {
         initDrawerLayout();
         connectWebSocket();
 
-//        XXPermissions.with(this)
-//                .permission(Permission.NOTIFICATION_SERVICE)
-//                .request((permissions, all) -> {
-//                    if (all) {
-//                        Bitmap avatar = BitmapFactory.decodeResource(getResources(), R.drawable.person);
-//                        createMessageNotification("Alice", "Hello, how are you?", "Just now", avatar);
-//                    }
-//                });
+        NotificationHelper.getNotification(this);
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent.getBooleanExtra(OPEN_CHAT_ACTIVITY, false)) {
+            Intent startIntent = new Intent(this, ChatActivity.class);
+            Bundle extras = intent.getExtras();
+            if(extras != null) {
+                startIntent.putExtras(extras);
+            }
+            startActivity(startIntent);
+        }
+    }
+
+    WebSocketManager.MessageCallback messageCallback;
     private void connectWebSocket() {
         String token = Hawk.get("loginToken");
-        WebSocketManager.getInstance().setMessageCallback(new WebSocketManager.MessageCallback() {
+        messageCallback = new WebSocketManager.MessageCallback() {
             @Override
             public void onMessage(String message) {
-                runOnUiThread(() -> MyToast.show("收到消息："+message));
+//                runOnUiThread(() -> MyToast.show("收到消息：" + message));
                 try {
+                    ConsoleUtils.logErr(message);
                     JSONObject jsonObject = new JSONObject(message);
                     String senderId = jsonObject.getString("senderId");
 //                    long timestamp = jsonObject.getLong("timestamp");
+                    JSONObject userInfo = jsonObject.getJSONObject("userInfo");
+                    String nickname = userInfo.getString("nickname");
+                    String content = jsonObject.getString("content");
+
                     List<MessageListItem> messageList = MessageFragment.getMessageList();
+                    MessageListItem sendMessageListItem = null;
                     boolean isExist = false;
                     for (MessageListItem messageListItem : messageList) {
                         String userId = messageListItem.getUserId();
                         if (userId.trim().equals(senderId.trim())) {
-                            JSONObject userInfo = jsonObject.getJSONObject("userInfo");
-                            String nickname = userInfo.getString("nickname");
-                            String content = jsonObject.getString("content");
+                            //如果存在，则更新消息
+                            sendMessageListItem = messageListItem;
                             messageListItem.setLastMessage(content);
-                            messageListItem.setLastTime(TimeUtils.friendlyTime(System.currentTimeMillis()));
-                            messageListItem.setUnreadCount(messageListItem.getUnreadCount()+1);
-
+                            messageListItem.setLastTime(TimeUtils.getMessageTime(System.currentTimeMillis()));
+                            messageListItem.setUnreadCount(messageListItem.getUnreadCount() + 1); //未读加1
+                            //添加到消息列表中
                             List<ChatMessage> chatMessageList = messageListItem.getChatMessageList();
                             ChatMessage chatMessage = new ChatMessage(senderId, nickname,
                                     token, content, 1);
@@ -106,11 +123,9 @@ public class MainActivity extends BaseActivity {
                             break;
                         }
                     }
+
                     //如不存在聊天记录，则添加到聊天中
-                    if(!isExist){
-                        JSONObject userInfo = jsonObject.getJSONObject("userInfo");
-                        String content = jsonObject.getString("content");
-                        String nickname = userInfo.getString("nickname");
+                    if (!isExist) {
                         long currentTimeMillis = System.currentTimeMillis();
                         String avatar = userInfo.getString("avatar");
                         int id = userInfo.getInt("id");
@@ -118,11 +133,11 @@ public class MainActivity extends BaseActivity {
                         messageListItem.setUserId(String.valueOf(id));
                         messageListItem.setAvatar(avatar);
                         messageListItem.setLastMessage(content);
-                        messageListItem.setLastTime(TimeUtils.friendlyTime(currentTimeMillis));
+                        messageListItem.setLastTime(TimeUtils.getMessageTime(currentTimeMillis));
                         messageListItem.setOnline(true);
                         messageListItem.setUnreadCount(1);
                         messageListItem.setUsername(nickname);
-                        ArrayList<ChatMessage> chatMessages = new ArrayList<>();
+                        MessageList<ChatMessage> chatMessages = new MessageList<>();
                         ChatMessage chatMessage = new ChatMessage();
                         chatMessage.setContent(content);
                         chatMessage.setMessageType(1);
@@ -134,6 +149,15 @@ public class MainActivity extends BaseActivity {
                         chatMessages.add(chatMessage);
                         messageListItem.setChatMessageList(chatMessages);
                         messageList.add(messageListItem);
+                        sendMessageListItem = messageListItem;
+                    }
+
+                    //发送通知
+                    boolean allowNotification = NotificationHelper.isOpenNotification(MainActivity.this);
+                    if(allowNotification){
+                        Bitmap avatar = BitmapFactory.decodeResource(getResources(), R.drawable.person);
+                        String time = TimeUtils.getNotificationTime(System.currentTimeMillis());
+                        NotificationHelper.createMessageNotification(MainActivity.this,nickname, content,time, avatar,sendMessageListItem);
                     }
                     MessageFragment.refreshList = true;
                 } catch (Exception e) {
@@ -153,15 +177,19 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onError(String error) {
-                runOnUiThread(() ->
-                        MyToast.show("错误: " + error));
-            }
-        });
-        WebSocketManager.getInstance().connect();
-    }
+                ConsoleUtils.logErr("错误" + error);
 
-    private void createMessageNotification(String nickname, String message, String time, Bitmap avatar) {
-        NotificationHelper.createMessageNotification(this, nickname, message, time, avatar);
+                //重新连接服务器
+                if (!WebSocketManager.isConnectWebSocket) {
+                    view_pager.postDelayed(() -> WebSocketManager.getInstance().connect(), 500);
+                }
+
+//                runOnUiThread(() ->
+//                        MyToast.show("错误: " + error));
+            }
+        };
+        WebSocketManager.getInstance().setMessageCallback(messageCallback);
+        WebSocketManager.getInstance().connect();
     }
 
     private void initDrawerLayout() {
@@ -202,7 +230,7 @@ public class MainActivity extends BaseActivity {
             myDialog.setMessage("确定退出登录吗？");
             myDialog.setYesOnclickListener("确定退出", () -> {
                 myDialog.dismiss();
-                Hawk.delete("loginToken");
+                Hawk.remove("loginToken");
                 WebSocketManager.getInstance().disconnect(); //退出登录关闭连接
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
@@ -316,11 +344,23 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //重新连接服务器
+        if (!WebSocketManager.isConnectWebSocket) {
+            WebSocketManager.getInstance().connect();
+        }
+    }
+
     private boolean isReturn;
     private long touchTime = 0;
     @Override
     public void finish() {
         if(isReturn){
+            if(messageCallback != null){
+                WebSocketManager.getInstance().removeMessageCallback(messageCallback);
+            }
             super.finish();
         }
         if(isOpenDrawerLayout){

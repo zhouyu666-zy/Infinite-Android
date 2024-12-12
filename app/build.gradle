@@ -74,12 +74,15 @@ dependencies {
     //视频播放器
     implementation 'org.salient.artvideoplayer:artplayer-core:1.1.0'
     implementation "org.salient.artvideoplayer:artplayer-exo:1.1.0"
+
+    //加载GIF
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.1'
-    implementation 'com.orhanobut:hawk:2.0.1'
-//    implementation 'com.github.getActivity:XXPermissions:13.2'
+    implementation 'com.edmodo:cropper:1.0.1'
 
     //Gson
     implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'com.github.orhanobut:hawk:1.21'
+
 
     //音视频缓存库
     implementation 'com.danikula:videocache:2.7.1'
@@ -87,10 +90,14 @@ dependencies {
 
 
     //动画库
-    implementation 'com.airbnb.android:lottie:6.1.0'
-    //消息发送依赖库
-    implementation 'org.springframework:spring-messaging:5.3.9'// Spring 消息支持
-    implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.6' // STOMP 客户端
-    implementation 'org.java-websocket:Java-WebSocket:1.5.3'// WebSocket 支持
+//    implementation 'com.airbnb.android:lottie:6.1.0'
 
+    //消息发送依赖库
+//    implementation 'org.springframework:spring-messaging:5.3.9'// Spring 消息支持
+//    implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.6' // STOMP 客户端
+//    implementation 'org.java-websocket:Java-WebSocket:1.5.3'// WebSocket 支持
+
+    //权限请求库
+    implementation 'com.github.getActivity:XXPermissions:11.5'
+    implementation 'com.github.HuanTanSheng:EasyPhotos:3.1.5'
 }

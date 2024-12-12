@@ -4,7 +4,6 @@ package edu.ace.infinite.activity;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,6 +21,7 @@ import edu.ace.infinite.application.WebSocketManager;
 import edu.ace.infinite.fragment.MessageFragment;
 import edu.ace.infinite.pojo.ChatMessage;
 import edu.ace.infinite.pojo.MessageListItem;
+import edu.ace.infinite.utils.MessageList;
 import edu.ace.infinite.utils.TimeUtils;
 
 public class ChatActivity extends AppCompatActivity implements WebSocketManager.MessageCallback {
@@ -31,7 +31,7 @@ public class ChatActivity extends AppCompatActivity implements WebSocketManager.
     private Button buttonSend;
     private MessageAdapter messageAdapter;
     public static MessageListItem messageListItem;
-    private List<ChatMessage> chatMessages;
+    private MessageList<ChatMessage> chatMessages;
     private String currentUserId;
     private String currentUserName;
     private String targetUserId;
@@ -77,27 +77,17 @@ public class ChatActivity extends AppCompatActivity implements WebSocketManager.
         WebSocketManager.getInstance().setMessageCallback(this);
     }
     private void loadHistoryMessages() {
-        // 模拟加载历史消息
-//        ChatMessage welcomeMsg = new ChatMessage("system", "系统", targetUserId,
-//            "欢迎来到与 " + targetUserName + " 的聊天", 0);
-//        chatMessages.add(welcomeMsg);
-//
-//         添加一些模拟的历史消息
-//        addSimulatedMessage(targetUserId, targetUserName, "你好，很高兴认识你！");
-//        addSimulatedMessage(currentUserId, currentUserName, "你好，我也很高兴认识你！");
-        
         messageAdapter.notifyDataSetChanged();
         scrollToBottom();
     }
 
-    private void addSimulatedMessage(String senderId, String senderName, String content) {
-        ChatMessage message = new ChatMessage(senderId, senderName,
-            senderId.equals(currentUserId) ? targetUserId : currentUserId,
-            content, 1);
-        chatMessages.add(message);
-    }
 
     private void sendMessage() {
+        //重新连接服务器
+        if(!WebSocketManager.isConnectWebSocket){
+            WebSocketManager.getInstance().connect();
+        }
+
         String token = Hawk.get("loginToken");
         String messageText = editTextMessage.getText().toString().trim();
         if (!messageText.isEmpty()) {
@@ -115,7 +105,7 @@ public class ChatActivity extends AppCompatActivity implements WebSocketManager.
             scrollToBottom();
 
             messageListItem.setLastMessage(messageText);
-            messageListItem.setLastTime(TimeUtils.friendlyTime(System.currentTimeMillis()));
+            messageListItem.setLastTime(TimeUtils.getMessageTime(System.currentTimeMillis()));
 
             // 清空输入框
             editTextMessage.setText("");
@@ -127,14 +117,16 @@ public class ChatActivity extends AppCompatActivity implements WebSocketManager.
     }
     @Override
     public void onMessage(String message) {
-        runOnUiThread(() -> {
-            //收到消息更新
+        if(!isFinishing()){
+            runOnUiThread(() -> {
+                //收到消息更新
 //            ChatMessage chatMessage = new Gson().fromJson(message, ChatMessage.class);
 //            chatMessages.add(chatMessage);
-            messageListItem.setUnreadCount(0);
-            messageAdapter.notifyItemInserted(chatMessages.size() - 1);
-            scrollToBottom();
-        });
+                messageListItem.setUnreadCount(0);
+                messageAdapter.notifyItemInserted(chatMessages.size() - 1);
+                scrollToBottom();
+            });
+        }
     }
 
     @Override
@@ -166,13 +158,13 @@ public class ChatActivity extends AppCompatActivity implements WebSocketManager.
 
     @Override
     protected void onDestroy() {
-        WebSocketManager.getInstance().removeMessageCallback(this);
-        chatMessages = new ArrayList<>();
+        chatMessages = new MessageList<>();
         super.onDestroy();
     }
 
     @Override
     public void finish() {
+        WebSocketManager.getInstance().removeMessageCallback(this);
         MessageFragment.refreshList = true;
         super.finish();
     }

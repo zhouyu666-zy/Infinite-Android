@@ -1,11 +1,9 @@
 package edu.ace.infinite.pojo;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import edu.ace.infinite.utils.ConsoleUtils;
+import edu.ace.infinite.utils.MessageList;
 import edu.ace.infinite.utils.TimeUtils;
 
 public class MessageListItem {
@@ -17,7 +15,7 @@ public class MessageListItem {
     private boolean online;
     private int unreadCount;
 
-    private List<ChatMessage> chatMessageList;
+    private MessageList<ChatMessage> chatMessageList;
 
     public MessageListItem() {
 //        this.userId = userId;
@@ -35,11 +33,11 @@ public class MessageListItem {
         message.setUserId(String.valueOf(user.getId()));
         message.setAvatar(user.getAvatar());
         message.setLastMessage("感谢您的关注！");
-        message.setLastTime(TimeUtils.friendlyTime(followTime));
+        message.setLastTime(TimeUtils.getMessageTime(followTime));
         message.setOnline(true);
         message.setUnreadCount(1);
         message.setUsername(user.getNickname());
-        message.chatMessageList = new ArrayList<>();
+        message.chatMessageList = new MessageList<>();
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setContent("感谢您的关注！");
         chatMessage.setMessageType(1);
@@ -74,14 +72,14 @@ public class MessageListItem {
     public int getUnreadCount() { return unreadCount; }
     public void setUnreadCount(int unreadCount) { this.unreadCount = unreadCount; }
 
-    public List<ChatMessage> getChatMessageList() {
+    public MessageList<ChatMessage> getChatMessageList() {
         if(chatMessageList == null){
-            chatMessageList = new ArrayList<>();
+            chatMessageList = new MessageList<>();
         }
         return chatMessageList;
     }
 
-    public void setChatMessageList(List<ChatMessage> chatMessageList) {
+    public void setChatMessageList(MessageList<ChatMessage> chatMessageList) {
         this.chatMessageList = chatMessageList;
     }
 }

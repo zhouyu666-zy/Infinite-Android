@@ -9,7 +9,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import edu.ace.infinite.R;
@@ -57,7 +56,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         ChatMessage chatMessage = messages.get(position);
         holder.message_content.setText(chatMessage.getContent());
         holder.nickname.setText(chatMessage.getSenderName());
-        holder.sendTime.setText(TimeUtils.friendlyTime(chatMessage.getTimestamp()));
+        holder.sendTime.setText(TimeUtils.getMessageTime(chatMessage.getTimestamp()));
 
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarImage.getLayoutParams();
         if (currentUserId.equals(chatMessage.getSenderId())) {

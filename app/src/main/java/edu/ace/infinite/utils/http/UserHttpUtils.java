@@ -1,5 +1,7 @@
 package edu.ace.infinite.utils.http;
 
+import android.graphics.Bitmap;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.orhanobut.hawk.Hawk;
@@ -8,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,6 +19,7 @@ import edu.ace.infinite.pojo.User;
 import edu.ace.infinite.utils.ConsoleUtils;
 import okhttp3.FormBody;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
@@ -137,5 +141,47 @@ public class UserHttpUtils {
             e.printStackTrace();
         }
         return false;
+    }
+
+    /**
+     * 上传图像
+     * @param type 0为头像，1为背景
+     */
+    public static boolean uploadImage(int type, Bitmap bitmap, String fileName) {
+        String token = Hawk.get("loginToken");
+        byte[] imageBytes = bitmapToByteArray(bitmap);
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", fileName,
+                        RequestBody.create(MediaType.parse("image/jpeg"), imageBytes))
+                .build();
+
+        String url = Config.BaseUrl;
+        if (type == 0) {
+            url += "/user/updateAvatar";
+        }else if (type == 1) {
+            url += "/user/uploadBackground";
+        }
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("token",token)
+                .post(requestBody)
+                .build();
+        try {
+            String result = Objects.requireNonNull(Config.client.newCall(request).execute().body()).string();
+
+            JSONObject jsonObject = new JSONObject(result);
+            int code = jsonObject.getInt("code");
+            return code == 200;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    //将Bitmap转换为字节数组
+    public static byte[] bitmapToByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        return stream.toByteArray();
     }
 }

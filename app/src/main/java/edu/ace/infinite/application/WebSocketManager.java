@@ -22,6 +22,8 @@ public class WebSocketManager {
     private final String wsUrl = "ws://"+ Config.IP +"/message"; // WebSocket服务器地址
     private List<MessageCallback> messageCallbacks = new ArrayList<>();
 
+    public static boolean isConnectWebSocket = false;
+
     public interface MessageCallback {
         void onMessage(String message);
         void onConnected();
@@ -60,6 +62,7 @@ public class WebSocketManager {
             @Override
             public void onOpen(@NonNull WebSocket webSocket, @NonNull Response response) {
                 ConsoleUtils.logErr("WebSocket连接成功");
+                isConnectWebSocket = true;
                 for (MessageCallback messageCallback : messageCallbacks) {
                     if (messageCallback != null) {
                         messageCallback.onConnected();
@@ -68,7 +71,7 @@ public class WebSocketManager {
             }
             @Override
             public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
-                Log.d(TAG, "收到消息: " + text);
+//                Log.d(TAG, "收到消息: " + text);
                 handleMessage(text);
                 for (MessageCallback messageCallback : messageCallbacks) {
                     if (messageCallback != null) {
@@ -80,6 +83,7 @@ public class WebSocketManager {
             @Override
             public void onClosing(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
                 webSocket.close(1000, null);
+                isConnectWebSocket = false;
                 for (MessageCallback messageCallback : messageCallbacks) {
                     if (messageCallback != null) {
                         messageCallback.onDisconnected();
@@ -90,6 +94,7 @@ public class WebSocketManager {
             @Override
             public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, Response response) {
                 Log.e(TAG, "WebSocket连接失败", t);
+                isConnectWebSocket = false;
                 for (MessageCallback messageCallback : messageCallbacks) {
                     if (messageCallback != null) {
                         messageCallback.onError(t.getMessage());
@@ -113,24 +118,23 @@ public class WebSocketManager {
 
     private void handleMessage(String message) {
 
-        ConsoleUtils.logErr(message);
-
+//        ConsoleUtils.logErr(message);
         // 解析消息并更新UI
-        ChatMessage chatMessage = parseMessage(message);
-        // 根据消息类型进行处理
-        switch (chatMessage.getMessageType()) {
-            case 1: // JOIN
-                // 处理用户加入聊天室
-                break;
-            case 2: // CHAT
-                // 更新UI以显示新消息
-                break;
-            case 3: // PRIVATE
-//                if(chatMessage.getReceiverId().equals(userId)) {
-//                    // 显示私聊消息
-//                }
-                break;
-        }
+//        ChatMessage chatMessage = parseMessage(message);
+//        // 根据消息类型进行处理
+//        switch (chatMessage.getMessageType()) {
+//            case 1: // JOIN
+//                // 处理用户加入聊天室
+//                break;
+//            case 2: // CHAT
+//                // 更新UI以显示新消息
+//                break;
+//            case 3: // PRIVATE
+////                if(chatMessage.getReceiverId().equals(userId)) {
+////                    // 显示私聊消息
+////                }
+//                break;
+//        }
     }
 
     public ChatMessage parseMessage(String jsonMessage) {

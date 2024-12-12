@@ -78,4 +78,8 @@
     <color name="colorAccent">#FF4081</color> <!-- 聚焦时的背景颜色 -->
     <color name="follow_color">#3AA8FF</color> <!-- 蓝色 -->
     <color name="unfollow_color">#FF6054</color> <!-- 红色 -->
+
+
+    <!--相册选择样式-->
+    <color name="easy_photos_fg_accent">@color/Theme</color> <!--前景突出色，如发送按钮的背景色，选中状态的颜色-->
 </resources>

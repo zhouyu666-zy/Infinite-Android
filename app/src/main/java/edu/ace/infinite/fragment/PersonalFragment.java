@@ -1,9 +1,18 @@
 package edu.ace.infinite.fragment;
 
+import static edu.ace.infinite.activity.CropImageActivity.CroppedImageBitmap;
+
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -11,14 +20,17 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.OpenableColumns;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
@@ -26,14 +38,26 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
+import com.huantansheng.easyphotos.EasyPhotos;
+import com.huantansheng.easyphotos.models.album.entity.Photo;
+
+import java.util.ArrayList;
 
 import edu.ace.infinite.R;
+import edu.ace.infinite.activity.CropImageActivity;
 import edu.ace.infinite.activity.MainActivity;
 import edu.ace.infinite.fragment.personalfragment.FavoritesFragment;
 import edu.ace.infinite.fragment.personalfragment.LikesFragment;
 import edu.ace.infinite.fragment.personalfragment.WorksFragment;
 import edu.ace.infinite.utils.ConsoleUtils;
+import edu.ace.infinite.utils.GlideEngine;
 import edu.ace.infinite.utils.PhoneMessage;
+import edu.ace.infinite.utils.http.UserHttpUtils;
+import edu.ace.infinite.view.MyDialog;
+import edu.ace.infinite.view.MyProgressDialog;
+import edu.ace.infinite.view.MyToast;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class PersonalFragment extends BaseFragment {
@@ -143,6 +167,38 @@ public class PersonalFragment extends BaseFragment {
                 return 3;
             }
         });
+
+
+        ivAvatar.setOnClickListener(view12 -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+                MyDialog myDialog2 = new MyDialog(getActivity());
+                myDialog2.setTitle("所有文件访问权限");
+                myDialog2.setMessage("由于Android 11以上系统限制，访问相册需要所有文件访问权限");
+                myDialog2.setYesOnclickListener("去开启", () -> {
+                    myDialog2.dismiss();
+                    XXPermissions.with(this)
+                            // 适配 Android 11 需要这样写，这里无需再写 Permission.Group.STORAGE
+                            .permission(Permission.MANAGE_EXTERNAL_STORAGE)
+                            .request((permissions, all) -> {
+                                if (all) {
+                                    EasyPhotos.createAlbum(this, false,false, GlideEngine.getInstance())//参数说明：上下文，是否显示相机按钮，是否使用宽高数据（false时宽高数据为0，扫描速度更快），[配置Glide为图片加载引擎](https://github.com/HuanTanSheng/EasyPhotos/wiki/12-%E9%85%8D%E7%BD%AEImageEngine%EF%BC%8C%E6%94%AF%E6%8C%81%E6%89%80%E6%9C%89%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD%E5%BA%93)
+                                            .setPuzzleMenu(false) //设置是否显示拼图按钮
+                                            .setCleanMenu(false)  //设置是否显示清空按钮
+                                            .start(IMAGE_RETURN_CODE);
+                                }
+                            });
+                });
+                myDialog2.setNoOnclickListener("取消", myDialog2::dismiss);
+                myDialog2.show();
+            }else {
+                EasyPhotos.createAlbum(this, false,false, GlideEngine.getInstance())//参数说明：上下文，是否显示相机按钮，是否使用宽高数据（false时宽高数据为0，扫描速度更快），[配置Glide为图片加载引擎](https://github.com/HuanTanSheng/EasyPhotos/wiki/12-%E9%85%8D%E7%BD%AEImageEngine%EF%BC%8C%E6%94%AF%E6%8C%81%E6%89%80%E6%9C%89%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD%E5%BA%93)
+                        .setPuzzleMenu(false) //设置是否显示拼图按钮
+                        .setCleanMenu(false)  //设置是否显示清空按钮
+                        .start(IMAGE_RETURN_CODE);
+            }
+
+        });
+
     }
 
 
@@ -176,5 +232,81 @@ public class PersonalFragment extends BaseFragment {
         tvIntro.setText("点击添加介绍，让大家认识你...");
     }
 
+    public static final int IMAGE_RETURN_CODE = 102; //图片选择返回码
+    public static final int RESIZE_REQUEST_CODE = 103; //裁剪图片返回码
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            switch (requestCode) {
+                case IMAGE_RETURN_CODE: //执行裁剪
+                    if(data != null){
+                        ArrayList<Photo> resultPhotos = data.getParcelableArrayListExtra(EasyPhotos.RESULT_PHOTOS);
+                        if(resultPhotos != null && !resultPhotos.isEmpty()){
+                            Photo photo = resultPhotos.get(0);
+                            Intent intent = new Intent(getActivity(), CropImageActivity.class);
+
+                            int BACKGROUND_X = 1;
+                            int BACKGROUND_Y = 1;
+                            CropImageActivity.xyScale[0] = BACKGROUND_X; //设置裁剪比例X
+                            CropImageActivity.xyScale[1] = BACKGROUND_Y;  //设置裁剪比例Y
+                            CropImageActivity.uri = photo.uri;
+//                            intent.putExtra("uri",photo.uri);
+                            startActivityForResult(intent,RESIZE_REQUEST_CODE);
+                        }
+                    }
+                    break;
+                case RESIZE_REQUEST_CODE: //裁剪完成
+                    if (data != null) {
+                        if(CroppedImageBitmap == null){
+                            MyToast.show("图片读取失败，请重试", Toast.LENGTH_LONG,false);
+                            return;
+                        }
+                        Uri uri = CropImageActivity.uri;
+                        String fileName = getFileNameFromContentUri(getContext(), uri);
+
+                        final MyProgressDialog myProgressDialog = new MyProgressDialog(getActivity());
+                        myProgressDialog.setTitleStr("上传图片");
+                        myProgressDialog.setHintStr("正在上传，请稍等...");
+                        myProgressDialog.setCanceledOnTouchOutside(false);
+                        myProgressDialog.show();
+                        new Thread(() -> {
+                            boolean b = UserHttpUtils.uploadImage(0, CroppedImageBitmap, fileName);
+                            getActivity().runOnUiThread(() -> {
+                                if(b){
+                                    MyToast.show("上传成功", Toast.LENGTH_LONG,true);
+                                }else {
+                                    MyToast.show("上传失败，请重试", Toast.LENGTH_LONG,false);
+                                }
+                                myProgressDialog.dismiss();
+                            });
+                        }).start();
+                    }
+                    break;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public String getFileNameFromContentUri(Context context, Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            try (Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (displayNameIndex >= 0) {
+                        result = cursor.getString(displayNameIndex);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (result == null) {
+            result = uri.getLastPathSegment();
+        }
+        return result;
+    }
 }

@@ -21,10 +21,13 @@ import com.orhanobut.hawk.Hawk;
 import org.salient.artplayer.exo.ExoMediaPlayer;
 import org.salient.artplayer.exo.ExoSourceBuilder;
 
+import java.util.List;
 import java.util.Map;
 
 import edu.ace.infinite.R;
 import edu.ace.infinite.application.Application;
+import edu.ace.infinite.fragment.MessageFragment;
+import edu.ace.infinite.pojo.MessageListItem;
 import edu.ace.infinite.utils.ConsoleUtils;
 import pl.droidsonroids.gif.GifImageView;
 
@@ -35,6 +38,7 @@ public class StartActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_start);
         super.onCreate(savedInstanceState);
+        Application.appAlive = 1;
         setStatusBarTextColor(true);
 
 
@@ -67,9 +71,23 @@ public class StartActivity extends BaseActivity {
     }
 
     private void skip() {
+        String token = Hawk.get("loginToken");
+//        new Thread(() -> {
+//            //初始化数据
+//            try {
+//                if(token != null){
+//                    if(Hawk.contains("messageList")){
+//                        MessageFragment.setMessageList(Hawk.get("messageList"));
+//                    }
+//                }
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
+//        }).start();
+
+
         new Handler().postDelayed(() -> {
             Intent intent;
-            String token = Hawk.get("loginToken");
             if(token == null){
                 intent = new Intent(StartActivity.this, LoginActivity.class);
             }else {

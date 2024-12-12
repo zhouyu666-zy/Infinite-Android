@@ -1,12 +1,14 @@
 package edu.ace.infinite.utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class TimeUtils {
     /**
      * 将时间戳转换为友好显示的时间字符串。
      */
-    public static String friendlyTime(Long timestamp) {
+    public static String getMessageTime(Long timestamp) {
         if (timestamp == null) {
             return "未知时间";
         }
@@ -33,5 +35,10 @@ public class TimeUtils {
         } else {
             return "刚刚";
         }
+    }
+
+    public static String getNotificationTime(long time) {
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        return sdf.format(time);
     }
 }

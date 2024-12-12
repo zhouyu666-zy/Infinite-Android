@@ -268,7 +268,6 @@ public class LoginActivity extends BaseActivity {
             myProgressDialog.setOnDismissListener(dialog -> {
                 dialogCancel.set(true);
             });
-            //TODO 处理登录 完成后执行 myProgressDialog.dismiss();
 
             new Thread(() -> {
                 boolean login = UserHttpUtils.login(username_text, password_text);
@@ -276,6 +275,8 @@ public class LoginActivity extends BaseActivity {
                     if(login){
                         MyToast.show("登录成功",true);
                         startActivity(new Intent(this, MainActivity.class));
+                        isReturn = true;
+                        finish();
                     }else {
                         MyToast.show("登录失败，请确认您的账号密码",false);
                     }

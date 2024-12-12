@@ -38,6 +38,10 @@ public class MessageFragment extends BaseFragment {
         }
         return messageList;
     }
+    public static void setMessageList(List<MessageListItem> messageList){
+          MessageFragment.messageList = messageList;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
