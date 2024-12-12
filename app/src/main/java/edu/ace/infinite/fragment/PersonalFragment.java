@@ -49,8 +49,6 @@ import com.huantansheng.easyphotos.models.album.entity.Photo;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import edu.ace.infinite.R;
 import edu.ace.infinite.activity.CropImageActivity;
@@ -71,7 +69,6 @@ import edu.ace.infinite.utils.http.UserHttpUtils;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class PersonalFragment extends BaseFragment {
-    private static final Logger log = LoggerFactory.getLogger(PersonalFragment.class);
     private ImageView ivAvatar;
     private TextView tvUsername, tvFollows, tvFollowing, tvIntro;
     private TabLayout tabLayout;
