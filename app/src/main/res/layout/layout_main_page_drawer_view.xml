@@ -19,13 +19,13 @@
         tools:ignore="UselessParent"
         android:orientation="vertical">
         <edu.ace.infinite.view.CircleImage
-            android:id="@+id/left_view_user_avatar"
+            android:id="@+id/drawer_view_user_avatar"
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:src="@drawable/person"/>
         <TextView
             android:layout_marginTop="10dp"
-            android:id="@+id/left_view_username"
+            android:id="@+id/drawer_view_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="13dp"
@@ -112,7 +112,7 @@
                             android:textColor="@color/textGeneral"
                             tools:ignore="HardcodedText,SpUsage" />
                         <TextView
-                            android:id="@+id/cache_size"
+                            android:id="@+id/cache_size_text"
                             android:layout_marginTop="5dp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

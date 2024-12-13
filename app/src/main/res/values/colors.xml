@@ -81,5 +81,7 @@
 
 
     <!--相册选择样式-->
-    <color name="easy_photos_fg_accent">@color/Theme</color> <!--前景突出色，如发送按钮的背景色，选中状态的颜色-->
+    <!--前景突出色，如发送按钮的背景色，选中状态的颜色-->
+    <color name="easy_photos_fg_accent">@color/Theme</color>
+    <color name="ThemeTinge">#66C1FB</color>
 </resources>

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
+    android:padding="10dp"
     android:orientation="horizontal">
 
     <ImageView
@@ -19,8 +19,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginEnd="60dp"
         android:gravity="end">
         <TextView
             android:id="@+id/nickname"
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:text="昵称"
             android:textStyle="bold"
-            android:textSize="12sp"
+            android:textSize="14sp"
             app:layout_constraintStart_toEndOf="@id/avatar_image"
             app:layout_constraintTop_toTopOf="@id/avatar_image"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -43,7 +43,7 @@
             android:paddingEnd="20dp"
             android:paddingBottom="10dp"
             android:textColor="#fff"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:layout_marginTop="4dp"
             android:background="@drawable/message_bg_blue_me"/>
 
@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:text="1分钟前"
             android:textSize="12sp"
-            android:layout_marginTop="4dp"/>
+            android:layout_marginTop="5dp"/>
     </LinearLayout>
 
 </RelativeLayout>

@@ -65,13 +65,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
             holder.message_content_layout.setGravity(Gravity.END);
             holder.message_content.setBackgroundResource(R.drawable.message_bg_blue_me);
+            holder.message_content.setTextColor(holder.itemView.getContext().getColor(R.color.white));
         } else {
             // 其他用户发送的消息，显示在左边
             layoutParams.removeRule(RelativeLayout.ALIGN_PARENT_END);
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_START);
             holder.message_content_layout.setGravity(Gravity.START);
             holder.message_content.setBackgroundResource(R.drawable.message_bg_white_other);
-            holder.message_content.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.black));
+            holder.message_content.setTextColor(holder.itemView.getContext().getColor(R.color.black));
         }
         holder.avatarImage.setLayoutParams(layoutParams);
     }

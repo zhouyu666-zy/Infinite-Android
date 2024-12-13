@@ -72,18 +72,18 @@ public class StartActivity extends BaseActivity {
 
     private void skip() {
         String token = Hawk.get("loginToken");
-//        new Thread(() -> {
-//            //初始化数据
-//            try {
-//                if(token != null){
-//                    if(Hawk.contains("messageList")){
-//                        MessageFragment.setMessageList(Hawk.get("messageList"));
-//                    }
-//                }
-//            }catch (Exception e){
-//                e.printStackTrace();
-//            }
-//        }).start();
+        new Thread(() -> {
+            //初始化数据
+            try {
+                if(token != null){
+                    if(Hawk.contains("login_information")){
+                        InformationChangeActivity.loginInformation = Hawk.get("login_information");
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }).start();
 
 
         new Handler().postDelayed(() -> {

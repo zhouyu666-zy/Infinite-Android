@@ -7,11 +7,14 @@ import static edu.ace.infinite.fragment.PersonalFragment.RESIZE_REQUEST_CODE;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.bumptech.glide.Glide;
 import com.huantansheng.easyphotos.EasyPhotos;
 import com.huantansheng.easyphotos.models.album.entity.Photo;
 import com.orhanobut.hawk.Hawk;
@@ -42,11 +46,14 @@ import edu.ace.infinite.fragment.personalfragment.LikesFragment;
 import edu.ace.infinite.fragment.personalfragment.WorksFragment;
 import edu.ace.infinite.pojo.ChatMessage;
 import edu.ace.infinite.pojo.MessageListItem;
+import edu.ace.infinite.pojo.User;
+import edu.ace.infinite.utils.CleanCacheUtils;
 import edu.ace.infinite.utils.ConsoleUtils;
 import edu.ace.infinite.utils.MessageList;
 import edu.ace.infinite.utils.NotificationHelper;
 import edu.ace.infinite.utils.PhoneMessage;
 import edu.ace.infinite.utils.TimeUtils;
+import edu.ace.infinite.utils.http.Config;
 import edu.ace.infinite.view.CustomViewPager;
 import edu.ace.infinite.view.MyDialog;
 import edu.ace.infinite.view.MyProgressDialog;
@@ -192,55 +199,7 @@ public class MainActivity extends BaseActivity {
         WebSocketManager.getInstance().connect();
     }
 
-    private void initDrawerLayout() {
-        LinearLayout left_view = findViewById(R.id.main_drawer_view);
-        left_view.setPadding(0, PhoneMessage.statusBarHeight,0,0);
-        ViewGroup.LayoutParams leftViewLayoutParams = left_view.getLayoutParams();
-        leftViewLayoutParams.width = (int) (PhoneMessage.getWidthPixels() * 0.7);
-        left_view.setLayoutParams(leftViewLayoutParams);
 
-        drawerLayout = findViewById(R.id.drawer_layout);
-        drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
-            @Override
-            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-                // 实现整个 Activity 左移效果
-                // 当侧滑菜单滑动时，移动主内容
-                View content = drawerLayout.getChildAt(0);
-                float distance = drawerView.getWidth() * slideOffset;
-                content.setTranslationX(-distance);
-            }
-            @Override
-            public void onDrawerOpened(@NonNull View drawerView) {
-                isOpenDrawerLayout = true;
-            }
-            @Override
-            public void onDrawerClosed(@NonNull View drawerView) {
-                isOpenDrawerLayout = false;
-            }
-            @Override
-            public void onDrawerStateChanged(int newState) {
-            }
-        });
-
-        //退出登录
-        findViewById(R.id.quit_login).setOnClickListener(view -> {
-            MyDialog myDialog = new MyDialog(this,R.style.MyDialog);
-            myDialog.setTitle("退出登录");
-            myDialog.setThemeColor(getColor(R.color.Theme2));
-            myDialog.setMessage("确定退出登录吗？");
-            myDialog.setYesOnclickListener("确定退出", () -> {
-                myDialog.dismiss();
-                Hawk.remove("loginToken");
-                WebSocketManager.getInstance().disconnect(); //退出登录关闭连接
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
-                isReturn = true;
-                finish();
-            });
-            myDialog.setNoOnclickListener("取消退出", myDialog::dismiss);
-            myDialog.show();
-        });
-    }
 
     private void initView() {
         view_pager = findViewById(R.id.main_view_pager);
@@ -326,7 +285,87 @@ public class MainActivity extends BaseActivity {
             view_pager.setCurrentItem(i);
             return false;
         });
+    }
 
+    private TextView drawer_view_username;
+    private ImageView drawer_view_user_avatar;
+
+    private void initDrawerLayout() {
+        drawer_view_username = findViewById(R.id.drawer_view_username);
+        drawer_view_user_avatar = findViewById(R.id.drawer_view_user_avatar);
+        TextView cache_size_text = findViewById(R.id.cache_size_text);
+
+        //清除缓存
+        findViewById(R.id.clear_cache).setOnClickListener(v -> {
+            CleanCacheUtils.getInstance().calculateCacheSize(cache_size_text);
+            CleanCacheUtils.getInstance().showDialog(this,cache_size_text);
+        });
+        CleanCacheUtils.getInstance().calculateCacheSize(cache_size_text);
+
+        LinearLayout left_view = findViewById(R.id.main_drawer_view);
+        left_view.setPadding(0, PhoneMessage.statusBarHeight,0,0);
+        ViewGroup.LayoutParams leftViewLayoutParams = left_view.getLayoutParams();
+        leftViewLayoutParams.width = (int) (PhoneMessage.getWidthPixels() * 0.7);
+        left_view.setLayoutParams(leftViewLayoutParams);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+                // 实现整个 Activity 左移效果
+                // 当侧滑菜单滑动时，移动主内容
+                View content = drawerLayout.getChildAt(0);
+                float distance = drawerView.getWidth() * slideOffset;
+                content.setTranslationX(-distance);
+            }
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+                isOpenDrawerLayout = true;
+                CleanCacheUtils.getInstance().calculateCacheSize(cache_size_text);
+            }
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+                isOpenDrawerLayout = false;
+            }
+            @Override
+            public void onDrawerStateChanged(int newState) {
+            }
+        });
+
+        //编辑信息
+        findViewById(R.id.edit_message).setOnClickListener(view -> {
+            closeDrawer();
+            view.postDelayed(() -> {
+                closeDrawer();
+                Intent intent = new Intent(MainActivity.this, InformationChangeActivity.class);
+                startActivity(intent);
+            },200);
+        });
+
+        //退出登录
+        findViewById(R.id.quit_login).setOnClickListener(view -> {
+            MyDialog myDialog = new MyDialog(this,R.style.MyDialog);
+            myDialog.setTitle("退出登录");
+            myDialog.setThemeColor(getColor(R.color.Theme2));
+            myDialog.setMessage("确定退出登录吗？");
+            myDialog.setYesOnclickListener("确定退出", () -> {
+                myDialog.dismiss();
+                Hawk.delete("loginToken");
+                WebSocketManager.getInstance().disconnect(); //退出登录关闭连接
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                isReturn = true;
+                finish();
+            });
+            myDialog.setNoOnclickListener("取消退出", myDialog::dismiss);
+            myDialog.show();
+        });
+    }
+
+    public void refreshUser(User user) {
+        String avatarUrl = Config.BaseUrl + user.getAvatar();
+        drawer_view_username.setText(user.getNickname());
+        Glide.with(this).load(avatarUrl).into(drawer_view_user_avatar);
     }
 
     private int currPage = 0;
@@ -341,6 +380,12 @@ public class MainActivity extends BaseActivity {
     public void openDrawer() {
         if(drawerLayout != null){
             drawerLayout.openDrawer(GravityCompat.END);
+        }
+    }
+
+    public void closeDrawer() {
+        if(drawerLayout != null && isOpenDrawerLayout){
+            drawerLayout.closeDrawer(GravityCompat.END);
         }
     }
 
@@ -381,6 +426,5 @@ public class MainActivity extends BaseActivity {
         }
 //        super.finish();
     }
-
 
 }

@@ -44,8 +44,8 @@
                 <!-- 用户头像 -->
                 <edu.ace.infinite.view.CircleImage
                     android:id="@+id/iv_avatar"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:contentDescription="User Avatar"
                     android:src="@drawable/logo"
                     />
@@ -111,9 +111,17 @@
                     android:id="@+id/tv_followers"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="32dp"
                     android:textColor="@color/black"
-                    android:text="218关注"
+                    android:text="218"
+                    android:textSize="15sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:layout_marginStart="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="32dp"
+                    android:textColor="@color/textGeneral"
+                    android:text="关注"
                     android:textSize="15sp" />
 
                 <TextView
@@ -121,7 +129,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
-                    android:text="15粉丝"
+                    android:text="15"
+                    android:textSize="15sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:layout_marginStart="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textGeneral"
+                    android:text="粉丝"
                     android:textSize="15sp" />
             </LinearLayout>
 
@@ -133,7 +149,7 @@
                 android:layout_marginTop="15dp"
                 android:text="这个家伙很懒什么也没有写……"
                 android:textSize="13sp"
-                android:textColor="@color/textTinge" />
+                android:textColor="@color/textTinge3" />
 
             <LinearLayout
                 android:layout_marginTop="5dp"
@@ -150,6 +166,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp">
                     <TextView
+                        android:id="@+id/tv_gender"
                         android:layout_gravity="center"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -169,6 +186,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp">
                     <TextView
+                        android:id="@+id/tv_age"
                         android:layout_gravity="center"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -188,6 +206,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp">
                     <TextView
+                        android:id="@+id/tv_location"
                         android:layout_gravity="center"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

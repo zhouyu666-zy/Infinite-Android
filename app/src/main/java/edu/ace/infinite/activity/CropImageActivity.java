@@ -29,7 +29,7 @@ public class CropImageActivity extends BaseActivity {
         setContentView(R.layout.activity_crop_image);
         BaseActivity.setStatusBarFullTransparent(getWindow());
 
-        Intent intent = getIntent();
+//        Intent intent = getIntent();
         cropImageView = findViewById(R.id.cropImageView);
         RelativeLayout.LayoutParams cropImageViewLayoutParams = (RelativeLayout.LayoutParams) cropImageView.getLayoutParams();
         cropImageViewLayoutParams.topMargin = PhoneMessage.statusBarHeight + PhoneMessage.dpToPx(50);

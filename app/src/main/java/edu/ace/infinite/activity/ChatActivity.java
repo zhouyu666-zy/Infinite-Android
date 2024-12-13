@@ -120,8 +120,6 @@ public class ChatActivity extends AppCompatActivity implements WebSocketManager.
         if(!isFinishing()){
             runOnUiThread(() -> {
                 //收到消息更新
-//            ChatMessage chatMessage = new Gson().fromJson(message, ChatMessage.class);
-//            chatMessages.add(chatMessage);
                 messageListItem.setUnreadCount(0);
                 messageAdapter.notifyItemInserted(chatMessages.size() - 1);
                 scrollToBottom();

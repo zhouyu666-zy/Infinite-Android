@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import edu.ace.infinite.R;
 import edu.ace.infinite.fragment.MessageFragment;
+import edu.ace.infinite.fragment.PersonalFragment;
 import edu.ace.infinite.pojo.User;
 import edu.ace.infinite.utils.http.UserHttpUtils;
 
@@ -95,6 +96,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                     });
                 }else {
                     MessageFragment.refreshFollowList = true;
+                    PersonalFragment.refreshInfo = true;
                 }
             }).start();
         });

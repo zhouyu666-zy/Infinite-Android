@@ -192,6 +192,7 @@ public class UserHttpUtils {
                 .build();
         try {
             String result = Objects.requireNonNull(Config.client.newCall(request).execute().body()).string();
+            Thread.sleep(1000);
 
             JSONObject jsonObject = new JSONObject(result);
             int code = jsonObject.getInt("code");
@@ -204,7 +205,26 @@ public class UserHttpUtils {
     //将Bitmap转换为字节数组
     public static byte[] bitmapToByteArray(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 10, stream);
         return stream.toByteArray();
+    }
+
+    public static boolean editUserInfo(User user) {
+        String token = Hawk.get("loginToken");
+        String json = new Gson().toJson(user);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), json);
+        Request request = new Request.Builder().url(Config.BaseUrl + "/user/editUserInfo")
+                .addHeader("token", token)
+                .post(requestBody)
+                .build();
+        try {
+            String result = Objects.requireNonNull(Config.client.newCall(request).execute().body()).string();
+            JSONObject jsonObject = new JSONObject(result);
+            int code = jsonObject.getInt("code");
+            return code == 200;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

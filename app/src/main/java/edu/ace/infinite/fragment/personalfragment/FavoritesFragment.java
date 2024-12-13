@@ -66,7 +66,7 @@ public class FavoritesFragment extends Fragment {
             return;
         }
         isRefreshing = true;
-        //获取点赞数据
+        //获取点赞列表
         new Thread(() -> {
             Video likeList = VideoHttpUtils.getLikeList();
             if(likeList != null){

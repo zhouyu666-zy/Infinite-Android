@@ -4,18 +4,17 @@ import static android.content.ContentValues.TAG;
 
 import android.annotation.SuppressLint;
 import static edu.ace.infinite.activity.CropImageActivity.CroppedImageBitmap;
+import static edu.ace.infinite.activity.InformationChangeActivity.getFileNameFromContentUri;
+import static edu.ace.infinite.activity.InformationChangeActivity.loginInformation;
 
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -29,7 +28,6 @@ import android.os.Looper;
 import android.util.Log;
 import android.provider.OpenableColumns;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -37,8 +35,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestBuilder;
-import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -52,21 +48,19 @@ import java.util.ArrayList;
 
 import edu.ace.infinite.R;
 import edu.ace.infinite.activity.CropImageActivity;
+import edu.ace.infinite.activity.InformationChangeActivity;
 import edu.ace.infinite.activity.MainActivity;
 import edu.ace.infinite.fragment.personalfragment.FavoritesFragment;
 import edu.ace.infinite.fragment.personalfragment.LikesFragment;
 import edu.ace.infinite.fragment.personalfragment.WorksFragment;
 import edu.ace.infinite.pojo.User;
-import edu.ace.infinite.utils.ConsoleUtils;
 import edu.ace.infinite.utils.GlideEngine;
-import edu.ace.infinite.utils.PhoneMessage;
+import edu.ace.infinite.utils.TimeUtils;
 import edu.ace.infinite.utils.http.UserHttpUtils;
 import edu.ace.infinite.view.MyDialog;
 import edu.ace.infinite.view.MyProgressDialog;
 import edu.ace.infinite.view.MyToast;
 import edu.ace.infinite.utils.http.Config;
-import edu.ace.infinite.utils.http.UserHttpUtils;
-import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class PersonalFragment extends BaseFragment {
     private ImageView ivAvatar;
@@ -79,15 +73,19 @@ public class PersonalFragment extends BaseFragment {
     private Handler handler = new Handler(Looper.getMainLooper());
     private Runnable updateBackgroundRunnable;
 
+    private MainActivity activity;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         view = inflater.inflate(R.layout.fragment_personal, container, false);
         // 初始化视图
         initViews();
         // 设置用户信息
-        initUserInfo();
+        refreshInfo = true;
+        refreshInfo();
         // 设置TabLayout
         initTabLayout();
 
@@ -138,7 +136,11 @@ public class PersonalFragment extends BaseFragment {
         });
     }
 
+    private TextView tvGender;
+    private TextView tvAge;
+    private TextView tvLocation;
     private void initViews() {
+        activity = (MainActivity) getActivity();
         ivAvatar = findViewById(R.id.iv_avatar);
         tvUsername = findViewById(R.id.tv_username);
         tvIntro = findViewById(R.id.tv_intro);
@@ -146,6 +148,9 @@ public class PersonalFragment extends BaseFragment {
         tvFollowing = findViewById(R.id.tv_following);
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_pager);
+        tvGender = findViewById(R.id.tv_gender);
+        tvAge = findViewById(R.id.tv_age);
+        tvLocation = findViewById(R.id.tv_location);
 
         backgroundImage = view.findViewById(R.id.background_image);
         appBarLayout = view.findViewById(R.id.appbar);
@@ -189,8 +194,8 @@ public class PersonalFragment extends BaseFragment {
                             .request((permissions, all) -> {
                                 if (all) {
                                     EasyPhotos.createAlbum(this, false,false, GlideEngine.getInstance())//参数说明：上下文，是否显示相机按钮，是否使用宽高数据（false时宽高数据为0，扫描速度更快），[配置Glide为图片加载引擎](https://github.com/HuanTanSheng/EasyPhotos/wiki/12-%E9%85%8D%E7%BD%AEImageEngine%EF%BC%8C%E6%94%AF%E6%8C%81%E6%89%80%E6%9C%89%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD%E5%BA%93)
-                                            .setPuzzleMenu(false) //设置是否显示拼图按钮
-                                            .setCleanMenu(false)  //设置是否显示清空按钮
+                                            .setPuzzleMenu(false)
+                                            .setCleanMenu(false)
                                             .start(IMAGE_RETURN_CODE);
                                 }
                             });
@@ -199,8 +204,8 @@ public class PersonalFragment extends BaseFragment {
                 myDialog2.show();
             }else {
                 EasyPhotos.createAlbum(this, false,false, GlideEngine.getInstance())//参数说明：上下文，是否显示相机按钮，是否使用宽高数据（false时宽高数据为0，扫描速度更快），[配置Glide为图片加载引擎](https://github.com/HuanTanSheng/EasyPhotos/wiki/12-%E9%85%8D%E7%BD%AEImageEngine%EF%BC%8C%E6%94%AF%E6%8C%81%E6%89%80%E6%9C%89%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD%E5%BA%93)
-                        .setPuzzleMenu(false) //设置是否显示拼图按钮
-                        .setCleanMenu(false)  //设置是否显示清空按钮
+                        .setPuzzleMenu(false)
+                        .setCleanMenu(false)
                         .start(IMAGE_RETURN_CODE);
             }
 
@@ -227,22 +232,37 @@ public class PersonalFragment extends BaseFragment {
         ).attach();
     }
 
-    private void initUserInfo() {
+
+    @SuppressLint("SetTextI18n")
+    private void loadUserInfo() {
+        tvGender.setText(loginInformation.getSex());
+        long birthday = loginInformation.getBirthday();
+        if(birthday > 0){
+            tvAge.setText(TimeUtils.calculateAge(birthday) + "岁");
+        }
+        String district = loginInformation.getDistrict();
+        if(district!=null && !district.isEmpty()){
+            tvLocation.setText(district);
+        }
+
         // 从服务器获取用户信息
         new Thread(new Runnable() {
             @SuppressLint("SetTextI18n")
             @Override
             public void run() {
                 User user = UserHttpUtils.getUserInfo();
-                Log.e(TAG, "run: "+user.getNickname());
                if(user != null){
-                   getActivity().runOnUiThread(() -> {
+                   activity.runOnUiThread(() -> {
                        String s = Config.BaseUrl + user.getAvatar();
-                       Log.e(TAG, "run: "+s );
-                       Glide.with(getActivity()).load(s).into(ivAvatar);
+                       Glide.with(activity).load(s).into(ivAvatar);
+                       loginInformation.setAvatarUrl(s);
+                       loginInformation.setNickname(user.getNickname());
+                       loginInformation.setIntroduce(user.getIntro());
+                       loginInformation.setUsername(user.getUname());
                        tvUsername.setText(user.getNickname());
-                       tvFollows.setText("关注：" + user.getFollowCount() + "");
-                       tvFollowing.setText("粉丝：" + user.getFansCount() + "");
+                       tvFollows.setText(user.getFollowCount()+"");
+                       tvFollowing.setText(user.getFansCount()+"");
+                       activity.refreshUser(user);
                        if (user.getIntro() == null) {
                            user.setIntro("这个家伙很懒什么也没有写……");
                        } else {
@@ -252,6 +272,21 @@ public class PersonalFragment extends BaseFragment {
                }
             }
         }).start();
+    }
+
+    public static boolean refreshInfo = false;
+    private void refreshInfo() {
+        view.post(new Runnable() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void run() {
+                if(refreshInfo){
+                    refreshInfo = false;
+                    loadUserInfo();
+                }
+                view.postDelayed(this, 500);
+            }
+        });
     }
 
     public static final int IMAGE_RETURN_CODE = 102; //图片选择返回码
@@ -298,6 +333,7 @@ public class PersonalFragment extends BaseFragment {
                             getActivity().runOnUiThread(() -> {
                                 if(b){
                                     MyToast.show("上传成功", Toast.LENGTH_LONG,true);
+                                    refreshInfo = true;
                                 }else {
                                     MyToast.show("上传失败，请重试", Toast.LENGTH_LONG,false);
                                 }
@@ -310,25 +346,5 @@ public class PersonalFragment extends BaseFragment {
         }catch (Exception e){
             e.printStackTrace();
         }
-    }
-
-    public String getFileNameFromContentUri(Context context, Uri uri) {
-        String result = null;
-        if (uri.getScheme().equals("content")) {
-            try (Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
-                if (cursor != null && cursor.moveToFirst()) {
-                    int displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                    if (displayNameIndex >= 0) {
-                        result = cursor.getString(displayNameIndex);
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        if (result == null) {
-            result = uri.getLastPathSegment();
-        }
-        return result;
     }
 }
