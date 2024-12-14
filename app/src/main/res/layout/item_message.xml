@@ -7,7 +7,7 @@
     android:padding="10dp"
     android:orientation="horizontal">
 
-    <ImageView
+    <edu.ace.infinite.view.CircleImage
         android:layout_alignParentEnd="true"
         android:id="@+id/avatar_image"
         android:layout_width="50dp"

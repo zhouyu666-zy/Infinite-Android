@@ -30,6 +30,8 @@ public class NotificationHelper {
     private static final int NOTIFICATION_ID = 1;
 
     public static void createMessageNotification(Context context, String nickname, String message, String time, Bitmap avatar, MessageListItem item) {
+        avatar = BitmapTool.getRoundedCornerBitmap(avatar, PhoneMessage.dpToPx(24));
+
         ChatActivity.messageListItem = item;
         Intent intent = new Intent(context, MainActivity.class);
         intent.putExtra(MainActivity.OPEN_CHAT_ACTIVITY,true);

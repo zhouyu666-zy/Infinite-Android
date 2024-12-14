@@ -11,9 +11,13 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import edu.ace.infinite.R;
+import edu.ace.infinite.activity.InformationChangeActivity;
 import edu.ace.infinite.pojo.ChatMessage;
 import edu.ace.infinite.utils.TimeUtils;
+import edu.ace.infinite.utils.http.Config;
 
 import java.util.List;
 
@@ -66,6 +70,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             holder.message_content_layout.setGravity(Gravity.END);
             holder.message_content.setBackgroundResource(R.drawable.message_bg_blue_me);
             holder.message_content.setTextColor(holder.itemView.getContext().getColor(R.color.white));
+            String avatarUrl = InformationChangeActivity.loginInformation.getAvatarUrl();
+            Glide.with(holder.itemView.getContext()).load(avatarUrl).into(holder.avatarImage);
         } else {
             // 其他用户发送的消息，显示在左边
             layoutParams.removeRule(RelativeLayout.ALIGN_PARENT_END);
@@ -73,6 +79,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             holder.message_content_layout.setGravity(Gravity.START);
             holder.message_content.setBackgroundResource(R.drawable.message_bg_white_other);
             holder.message_content.setTextColor(holder.itemView.getContext().getColor(R.color.black));
+            Glide.with(holder.itemView.getContext()).load(Config.BaseUrl+chatMessage.getSenderAvatar()).into(holder.avatarImage);
         }
         holder.avatarImage.setLayoutParams(layoutParams);
     }

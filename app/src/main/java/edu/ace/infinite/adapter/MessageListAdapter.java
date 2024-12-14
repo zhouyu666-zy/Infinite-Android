@@ -10,9 +10,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+
 import edu.ace.infinite.R;
 import edu.ace.infinite.activity.ChatActivity;
 import edu.ace.infinite.pojo.MessageListItem;
+import edu.ace.infinite.utils.http.Config;
 
 import java.util.List;
 
@@ -67,6 +71,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             ChatActivity.messageListItem = item;
             context.startActivity(intent);
         });
+
+        Glide.with(context).load(Config.BaseUrl+item.getAvatar()).into(holder.avatarImage);
     }
 
     @Override

@@ -12,10 +12,13 @@ import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import edu.ace.infinite.R;
 import edu.ace.infinite.fragment.MessageFragment;
 import edu.ace.infinite.fragment.PersonalFragment;
 import edu.ace.infinite.pojo.User;
+import edu.ace.infinite.utils.http.Config;
 import edu.ace.infinite.utils.http.UserHttpUtils;
 
 import java.util.List;
@@ -54,6 +57,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         User user = users.get(position);
         holder.nicknameTextView.setText(user.getNickname());
 //        holder.avatarImage.setImageResource(user.getAvatarResId());
+
+        Glide.with(context).load(Config.BaseUrl+user.getAvatar()).into(holder.avatarImage);
         
         // 根据关注状态设置按钮文本和背景颜色
         if(user.isFollowed()){

@@ -49,6 +49,7 @@ import edu.ace.infinite.pojo.MessageListItem;
 import edu.ace.infinite.pojo.User;
 import edu.ace.infinite.utils.CleanCacheUtils;
 import edu.ace.infinite.utils.ConsoleUtils;
+import edu.ace.infinite.utils.GlideEngine;
 import edu.ace.infinite.utils.MessageList;
 import edu.ace.infinite.utils.NotificationHelper;
 import edu.ace.infinite.utils.PhoneMessage;
@@ -109,6 +110,7 @@ public class MainActivity extends BaseActivity {
                     JSONObject userInfo = jsonObject.getJSONObject("userInfo");
                     String nickname = userInfo.getString("nickname");
                     String content = jsonObject.getString("content");
+                    String avatar = userInfo.getString("avatar");
 
                     List<MessageListItem> messageList = MessageFragment.getMessageList();
                     MessageListItem sendMessageListItem = null;
@@ -118,14 +120,15 @@ public class MainActivity extends BaseActivity {
                         if (userId.trim().equals(senderId.trim())) {
                             //如果存在，则更新消息
                             sendMessageListItem = messageListItem;
-                            messageListItem.setLastMessage(content);
+                            messageListItem.setLastMessage(content); //设置未读信息
                             messageListItem.setLastTime(TimeUtils.getMessageTime(System.currentTimeMillis()));
                             messageListItem.setUnreadCount(messageListItem.getUnreadCount() + 1); //未读加1
-                            //添加到消息列表中
+                            //添加新消息到消息列表中
                             List<ChatMessage> chatMessageList = messageListItem.getChatMessageList();
                             ChatMessage chatMessage = new ChatMessage(senderId, nickname,
                                     token, content, 1);
-                            chatMessageList.add(chatMessage);
+                            chatMessage.setSenderAvatar(avatar);
+                            chatMessageList.add(chatMessage); //头像
                             isExist = true;
                             break;
                         }
@@ -134,7 +137,6 @@ public class MainActivity extends BaseActivity {
                     //如不存在聊天记录，则添加到聊天中
                     if (!isExist) {
                         long currentTimeMillis = System.currentTimeMillis();
-                        String avatar = userInfo.getString("avatar");
                         int id = userInfo.getInt("id");
                         MessageListItem messageListItem = new MessageListItem();
                         messageListItem.setUserId(String.valueOf(id));
@@ -162,9 +164,9 @@ public class MainActivity extends BaseActivity {
                     //发送通知
                     boolean allowNotification = NotificationHelper.isOpenNotification(MainActivity.this);
                     if(allowNotification){
-                        Bitmap avatar = BitmapFactory.decodeResource(getResources(), R.drawable.person);
+                        Bitmap avatarBitmap = Glide.with(MainActivity.this).asBitmap().load(Config.BaseUrl+sendMessageListItem.getAvatar()).submit(500, 500).get();;
                         String time = TimeUtils.getNotificationTime(System.currentTimeMillis());
-                        NotificationHelper.createMessageNotification(MainActivity.this,nickname, content,time, avatar,sendMessageListItem);
+                        NotificationHelper.createMessageNotification(MainActivity.this,nickname, content,time, avatarBitmap,sendMessageListItem);
                     }
                     MessageFragment.refreshList = true;
                 } catch (Exception e) {

@@ -9,7 +9,7 @@
     android:paddingEnd="20dp">
 
     <!-- 用户头像 -->
-    <ImageView
+    <edu.ace.infinite.view.CircleImage
         android:id="@+id/avatar_image"
         android:layout_width="50dp"
         android:layout_height="50dp"
