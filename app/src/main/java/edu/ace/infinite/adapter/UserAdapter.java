@@ -35,12 +35,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public static class UserViewHolder extends RecyclerView.ViewHolder {
         public ImageView avatarImage;
         public TextView nicknameTextView;
+        public TextView descTextView;
         public Button followButton;
 
         public UserViewHolder(View itemView) {
             super(itemView);
             avatarImage = itemView.findViewById(R.id.avatar_image);
             nicknameTextView = itemView.findViewById(R.id.nickname);
+            descTextView = itemView.findViewById(R.id.desc);
             followButton = itemView.findViewById(R.id.button_follow);
         }
     }
@@ -56,6 +58,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public void onBindViewHolder(UserViewHolder holder, int position) {
         User user = users.get(position);
         holder.nicknameTextView.setText(user.getNickname());
+
+        String intro = user.getIntro();
+        if(!intro.isEmpty()){
+            holder.descTextView.setText(intro);
+        }else {
+            holder.descTextView.setText("暂无简介");
+        }
 //        holder.avatarImage.setImageResource(user.getAvatarResId());
 
         Glide.with(context).load(Config.BaseUrl+user.getAvatar()).into(holder.avatarImage);

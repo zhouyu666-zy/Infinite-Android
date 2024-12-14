@@ -32,6 +32,9 @@ public class User {
     }
 
     public String getIntro() {
+        if (intro == null) {
+            intro = "";
+        }
         return intro;
     }
 
