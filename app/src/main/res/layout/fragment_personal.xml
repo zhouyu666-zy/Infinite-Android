@@ -116,7 +116,8 @@
                     android:textSize="15sp"
                     android:textStyle="bold"/>
                 <TextView
-                    android:layout_marginStart="10dp"
+                    android:id="@+id/followers"
+                    android:paddingStart="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="32dp"
@@ -133,7 +134,8 @@
                     android:textSize="15sp"
                     android:textStyle="bold"/>
                 <TextView
-                    android:layout_marginStart="10dp"
+                    android:id="@+id/following"
+                    android:paddingStart="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/textGeneral"

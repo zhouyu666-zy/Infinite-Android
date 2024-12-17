@@ -143,6 +143,33 @@ public class UserHttpUtils {
         }
         return users;
     }
+    public static List<User> getFansList() {
+        String token = Hawk.get("loginToken");
+        Request request = new Request.Builder().url(Config.BaseUrl + "/user/getFansList")
+                .addHeader("token", token)
+                .get()
+                .build();
+        ArrayList<User> users = new ArrayList<>();
+        try {
+            String result = Objects.requireNonNull(                                                      Config.client.newCall(request).execute().body()).string();
+            JSONObject jsonObject = new JSONObject(result);
+            int code = jsonObject.getInt("code");
+            ConsoleUtils.logErr(jsonObject.toString());
+            if(code == 200){
+                JSONArray data = jsonObject.getJSONArray("data");
+                for (int i = 0; i < data.length(); i++) {
+                    JSONObject userJson = data.getJSONObject(i);
+                    User user = new Gson().fromJson(userJson.toString(), User.class);
+                    users.add(user);
+                }
+                return users;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
 
 
     public static boolean followUser(Integer id, boolean isFollow) {

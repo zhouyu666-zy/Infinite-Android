@@ -272,11 +272,11 @@ public class InformationChangeActivity extends BaseActivity {
                     .setTitleColor(Color.BLACK)//标题文字颜色
                     .setSubmitColor(getColor(R.color.Theme))//确定按钮文字颜色
                     .setCancelColor(getColor(R.color.Theme))//取消按钮文字颜色
-                    .setTitleBgColor(getColor(R.color.themeColor))//标题背景颜色 Night mode
+                    .setTitleBgColor(getColor(R.color.themeColor))//标题背景颜色
                     .setBgColor(getColor(R.color.viewColor))//滚轮背景颜色 Night mode
                     .setLabel("年","月","日","时","分","秒")//默认设置为年月日时分秒
-                    .isCenterLabel(false) //是否只显示中间选中项的label文字，false则每项item全部都带有label。
-                    .isDialog(false)//是否显示为对话框样式
+                    .isCenterLabel(false)
+                    .isDialog(false)
                     .setDate(defaultSelectCalendar)
                     .setRangDate(startCalendar,Calendar.getInstance())
                     .build();

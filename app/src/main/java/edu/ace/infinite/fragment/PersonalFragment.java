@@ -48,6 +48,7 @@ import java.util.ArrayList;
 
 import edu.ace.infinite.R;
 import edu.ace.infinite.activity.CropImageActivity;
+import edu.ace.infinite.activity.FollowListActivity;
 import edu.ace.infinite.activity.InformationChangeActivity;
 import edu.ace.infinite.activity.MainActivity;
 import edu.ace.infinite.fragment.personalfragment.FavoritesFragment;
@@ -272,6 +273,20 @@ public class PersonalFragment extends BaseFragment {
                }
             }
         }).start();
+
+        // 在 PersonalFragment.java 中
+        TextView followers = findViewById(R.id.followers);
+        TextView following = findViewById(R.id.following);
+        followers.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), FollowListActivity.class);
+            intent.putExtra("isFollow", true);
+            startActivity(intent);
+        });
+        following.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), FollowListActivity.class);
+            intent.putExtra("isFollow", false);
+            startActivity(intent);
+        });
     }
 
     public static boolean refreshInfo = false;
