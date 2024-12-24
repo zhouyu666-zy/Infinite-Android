@@ -1,5 +1,7 @@
 package edu.ace.infinite.utils.http;
 
+import static edu.ace.infinite.utils.http.Config.client;
+
 import android.graphics.Bitmap;
 
 import com.google.gson.Gson;
@@ -11,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +25,7 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class UserHttpUtils {
     /**
@@ -34,7 +38,7 @@ public class UserHttpUtils {
                 .post(requestBody)
                 .build();
         try {
-            String result = Objects.requireNonNull(Config.client.newCall(request).execute().body()).string();
+            String result = Objects.requireNonNull(client.newCall(request).execute().body()).string();
 
             JSONObject jsonObject = new JSONObject(result);
             int code = jsonObject.getInt("code");
@@ -59,7 +63,7 @@ public class UserHttpUtils {
                 .post(requestBody)
                 .build();
         try {
-            String result = Objects.requireNonNull(Config.client.newCall(request).execute().body()).string();
+            String result = Objects.requireNonNull(client.newCall(request).execute().body()).string();
             return new JSONObject(result);
         } catch (Exception e) {
             e.printStackTrace();
@@ -76,7 +80,7 @@ public class UserHttpUtils {
                 .get()
                 .build();
         try {
-            String result = Objects.requireNonNull(Config.client.newCall(request).execute().body()).string();
+            String result = Objects.requireNonNull(client.newCall(request).execute().body()).string();
             JSONObject jsonObject = new JSONObject(result);
             int code = jsonObject.getInt("code");
             if (code == 200) {
@@ -98,7 +102,7 @@ public class UserHttpUtils {
                 .build();
         ArrayList<User> users = new ArrayList<>();
         try {
-            String result = Objects.requireNonNull(Config.client.newCall(request).execute().body()).string();
+            String result = Objects.requireNonNull(client.newCall(request).execute().body()).string();
 
             JSONObject jsonObject = new JSONObject(result);
             int code = jsonObject.getInt("code");
@@ -125,7 +129,7 @@ public class UserHttpUtils {
                 .build();
         ArrayList<User> users = new ArrayList<>();
         try {
-            String result = Objects.requireNonNull(Config.client.newCall(request).execute().body()).string();
+            String result = Objects.requireNonNull(client.newCall(request).execute().body()).string();
             JSONObject jsonObject = new JSONObject(result);
             int code = jsonObject.getInt("code");
             ConsoleUtils.logErr(jsonObject.toString());
@@ -151,7 +155,7 @@ public class UserHttpUtils {
                 .build();
         ArrayList<User> users = new ArrayList<>();
         try {
-            String result = Objects.requireNonNull(                                                      Config.client.newCall(request).execute().body()).string();
+            String result = Objects.requireNonNull(                                                      client.newCall(request).execute().body()).string();
             JSONObject jsonObject = new JSONObject(result);
             int code = jsonObject.getInt("code");
             ConsoleUtils.logErr(jsonObject.toString());
@@ -182,7 +186,7 @@ public class UserHttpUtils {
                 .post(builder.build())
                 .build();
         try {
-            String result = Objects.requireNonNull(Config.client.newCall(request).execute().body()).string();
+            String result = Objects.requireNonNull(client.newCall(request).execute().body()).string();
 
             JSONObject jsonObject = new JSONObject(result);
             int code = jsonObject.getInt("code");
@@ -218,7 +222,7 @@ public class UserHttpUtils {
                 .post(requestBody)
                 .build();
         try {
-            String result = Objects.requireNonNull(Config.client.newCall(request).execute().body()).string();
+            String result = Objects.requireNonNull(client.newCall(request).execute().body()).string();
             Thread.sleep(1000);
 
             JSONObject jsonObject = new JSONObject(result);
@@ -229,11 +233,48 @@ public class UserHttpUtils {
         }
         return false;
     }
+
     //将Bitmap转换为字节数组
     public static byte[] bitmapToByteArray(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 10, stream);
         return stream.toByteArray();
+    }
+
+
+    /**
+     * 上传视频
+     * @param path 视频路径
+     */
+    public static boolean uploadVideo(String path,String desc) {
+        String token = Hawk.get("loginToken");
+        File videoFile = new File(path);
+        if (!videoFile.exists()) { //视频不存在
+            return false;
+        }
+        MediaType mediaType = MediaType.parse("video/mp4");
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", videoFile.getName(), RequestBody.create(mediaType, videoFile))
+                .build();
+
+        Request request = new Request.Builder()
+                .url(Config.BaseUrl+"/api/video/uploadVideo?desc="+desc)
+                .addHeader("token",token)
+                .post(requestBody)
+                .build();
+
+        try {
+            String result = Objects.requireNonNull(client.newCall(request).execute().body()).string();
+            Thread.sleep(1000);
+
+            JSONObject jsonObject = new JSONObject(result);
+            int code = jsonObject.getInt("code");
+            return code == 200;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static boolean editUserInfo(User user) {
@@ -245,7 +286,7 @@ public class UserHttpUtils {
                 .post(requestBody)
                 .build();
         try {
-            String result = Objects.requireNonNull(Config.client.newCall(request).execute().body()).string();
+            String result = Objects.requireNonNull(client.newCall(request).execute().body()).string();
             JSONObject jsonObject = new JSONObject(result);
             int code = jsonObject.getInt("code");
             return code == 200;

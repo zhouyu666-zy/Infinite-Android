@@ -1,6 +1,7 @@
 package edu.ace.infinite.utils.http;
 
 import static edu.ace.infinite.utils.http.Config.BaseUrl;
+import static edu.ace.infinite.utils.http.Config.IP;
 import static edu.ace.infinite.utils.http.Config.client;
 
 import android.content.Context;
@@ -79,6 +80,34 @@ public class VideoHttpUtils {
         return false;
     }
 
+    //获取用户视频列表
+    public static Video getUserVideoList() {
+        String token = Hawk.get("loginToken");
+        FormBody.Builder formBody = new FormBody.Builder();
+        formBody.add("userId", token);
+        Request request = new Request.Builder().url(BaseUrl + "/api/video/getUserVideoList")
+                .addHeader("token", token)
+                .post(formBody.build())
+                .build();
+        try {
+            String result = client.newCall(request).execute().body().string();
+            Video video = new Gson().fromJson(result, Video.class);
+            // 假设 Video.Data 是一个类，video.getData() 返回一个 List<Video.Data>
+            List<Video.Data> dataList = video.getData();
+            //移除空对象
+            dataList.removeIf(Objects::isNull);
+
+            for (Video.Data data : dataList) {
+                data.setVideoSrc(BaseUrl + data.getVideoSrc());
+                data.setCoverSrc(BaseUrl + data.getCoverSrc());
+            }
+            return video;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    //获取点赞视频列表
     public static Video getLikeList(){
         String token = Hawk.get("loginToken");
         FormBody.Builder formBody = new FormBody.Builder();
@@ -94,6 +123,13 @@ public class VideoHttpUtils {
             List<Video.Data> dataList = video.getData();
             //移除空对象
             dataList.removeIf(Objects::isNull);
+
+            for (Video.Data data : dataList) {
+                if(data.getType().equals("1")){
+                    data.setVideoSrc(BaseUrl + data.getVideoSrc());
+                    data.setCoverSrc(BaseUrl + data.getCoverSrc());
+                }
+            }
             return video;
         } catch (Exception e) {
             e.printStackTrace();
@@ -139,4 +175,6 @@ public class VideoHttpUtils {
             return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/"+r1+"5."+r4+".2"+r2+"32.2"+r3+"2 Mobile Safari/5"+r4+"3.06";
         }
     }
+
+
 }

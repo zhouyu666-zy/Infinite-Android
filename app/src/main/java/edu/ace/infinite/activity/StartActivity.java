@@ -96,7 +96,7 @@ public class StartActivity extends BaseActivity {
             startActivity(intent);
             finish();
 
-        },5000);
+        },3000);
     }
 
     @Override

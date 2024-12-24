@@ -1,243 +1,260 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.PersonalFragment"
-    android:fitsSystemWindows="true">
+    tools:context=".fragment.PersonalFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
+        android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:fitsSystemWindows="true"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:fitsSystemWindows="true">
 
-
-            <ImageView
-                android:id="@+id/background_image"
+            <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="200dp"
                 android:fitsSystemWindows="true"
-                android:background="#000000"
-                android:scaleType="centerCrop" />
+                app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
 
-            <!--用户信息-->
-            <LinearLayout
-                android:id="@+id/user_info_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="10dp"
-                android:gravity="center_vertical"
-                app:layout_anchor="@+id/appbar"
-                app:layout_anchorGravity="center">
+                <ImageView
+                    android:id="@+id/background_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fitsSystemWindows="true"
+                    android:background="#000000"
+                    android:scaleType="centerCrop" />
 
-                <!-- 用户头像 -->
-                <edu.ace.infinite.view.CircleImage
-                    android:id="@+id/iv_avatar"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:contentDescription="User Avatar"
-                    android:src="@drawable/logo"
-                    />
+
+                <!--用户信息-->
+                <LinearLayout
+                    android:id="@+id/user_info_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="10dp"
+                    android:gravity="center_vertical"
+                    app:layout_anchor="@+id/appbar"
+                    app:layout_anchorGravity="center">
+
+                    <!-- 用户头像 -->
+                    <edu.ace.infinite.view.CircleImage
+                        android:id="@+id/iv_avatar"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:contentDescription="User Avatar"
+                        android:src="@drawable/logo"
+                        />
+
+                    <LinearLayout
+                        android:layout_marginStart="15dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <!-- 用户名 -->
+                        <TextView
+                            android:id="@+id/tv_username"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Username"
+                            android:textColor="@color/video_theme"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
                 <LinearLayout
-                    android:layout_marginStart="15dp"
-                    android:layout_width="match_parent"
+                    android:id="@+id/open_drawer_view"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <!-- 用户名 -->
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_gravity="end"
+                    tools:ignore="UselessParent"
+                    android:background="@drawable/touch_radius">
+                    <ImageView
+                        app:tint="@color/white"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/move_item_icon"
+                        tools:ignore="ContentDescription" />
+                </LinearLayout>
+
+
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:orientation="vertical"
+                android:background="@drawable/personal_view_radius">
+
+
+                <!-- 粉丝和关注 -->
+                <LinearLayout
+                    android:id="@+id/ll_stats"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
                     <TextView
-                        android:id="@+id/tv_username"
+                        android:id="@+id/tv_followers"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Username"
-                        android:textColor="@color/video_theme"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
+                        android:textColor="@color/black"
+                        android:text="218"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:id="@+id/followers"
+                        android:paddingStart="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="32dp"
+                        android:textColor="@color/textGeneral"
+                        android:text="关注"
+                        android:textSize="15sp" />
 
+                    <TextView
+                        android:id="@+id/tv_following"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:text="15"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:id="@+id/following"
+                        android:paddingStart="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/textGeneral"
+                        android:text="粉丝"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <!-- 简介 -->
+                <TextView
+                    android:id="@+id/tv_intro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="这个家伙很懒什么也没有写……"
+                    android:textSize="13sp"
+                    android:textColor="@color/textTinge3" />
+
+                <LinearLayout
+                    android:layout_marginTop="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <edu.ace.infinite.view.CardView
+                        app:view_radius="3dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:background="#1A454444"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp">
+                        <TextView
+                            android:id="@+id/tv_gender"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="男"
+                            android:textColor="#000000"
+                            android:textSize="11dp" />
+                    </edu.ace.infinite.view.CardView>
+                    <edu.ace.infinite.view.CardView
+                        android:layout_marginStart="5dp"
+                        app:view_radius="3dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:background="#1A454444"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp">
+                        <TextView
+                            android:id="@+id/tv_age"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="19岁"
+                            android:textColor="#000000"
+                            android:textSize="11dp" />
+                    </edu.ace.infinite.view.CardView>
+                    <edu.ace.infinite.view.CardView
+                        app:view_radius="3dp"
+                        android:layout_marginStart="5dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:background="#1A454444"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp">
+                        <TextView
+                            android:id="@+id/tv_location"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="四川 · 成都"
+                            android:textColor="#000000"
+                            android:textSize="11dp" />
+                    </edu.ace.infinite.view.CardView>
                 </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/open_drawer_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_gravity="end"
-                tools:ignore="UselessParent"
-                android:background="@drawable/touch_radius">
-                <ImageView
-                    app:tint="@color/white"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/move_item_icon"
-                    tools:ignore="ContentDescription" />
-            </LinearLayout>
-
-
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="15dp"
-            android:orientation="vertical"
-            android:background="@drawable/personal_view_radius">
-
-
-            <!-- 粉丝和关注 -->
-            <LinearLayout
-                android:id="@+id/ll_stats"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/tv_followers"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:text="218"
-                    android:textSize="15sp"
-                    android:textStyle="bold"/>
-                <TextView
-                    android:id="@+id/followers"
-                    android:paddingStart="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="32dp"
-                    android:textColor="@color/textGeneral"
-                    android:text="关注"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:id="@+id/tv_following"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:text="15"
-                    android:textSize="15sp"
-                    android:textStyle="bold"/>
-                <TextView
-                    android:id="@+id/following"
-                    android:paddingStart="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/textGeneral"
-                    android:text="粉丝"
-                    android:textSize="15sp" />
-            </LinearLayout>
-
-            <!-- 简介 -->
-            <TextView
-                android:id="@+id/tv_intro"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="这个家伙很懒什么也没有写……"
-                android:textSize="13sp"
-                android:textColor="@color/textTinge3" />
-
-            <LinearLayout
-                android:layout_marginTop="5dp"
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <edu.ace.infinite.view.CardView
-                    app:view_radius="3dp"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="3dp"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:background="#1A454444"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp">
-                    <TextView
-                        android:id="@+id/tv_gender"
-                        android:layout_gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="男"
-                        android:textColor="#000000"
-                        android:textSize="11dp" />
-                </edu.ace.infinite.view.CardView>
-                <edu.ace.infinite.view.CardView
-                    android:layout_marginStart="5dp"
-                    app:view_radius="3dp"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="3dp"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:background="#1A454444"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp">
-                    <TextView
-                        android:id="@+id/tv_age"
-                        android:layout_gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="19岁"
-                        android:textColor="#000000"
-                        android:textSize="11dp" />
-                </edu.ace.infinite.view.CardView>
-                <edu.ace.infinite.view.CardView
-                    app:view_radius="3dp"
-                    android:layout_marginStart="5dp"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="3dp"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:background="#1A454444"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp">
-                    <TextView
-                        android:id="@+id/tv_location"
-                        android:layout_gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="四川 · 成都"
-                        android:textColor="#000000"
-                        android:textSize="11dp" />
-                </edu.ace.infinite.view.CardView>
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                app:tabIndicatorColor="@color/Theme"
+                app:tabIndicatorHeight="3dp"
+                app:tabIndicatorFullWidth="false"
+                app:layout_collapseMode="pin"
+                android:paddingBottom="3dp"/>
 
-        </LinearLayout>
+        </com.google.android.material.appbar.AppBarLayout>
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/white"
-            app:tabIndicatorColor="@color/Theme"
-            app:tabIndicatorHeight="3dp"
-            app:tabIndicatorFullWidth="false"
-            app:layout_collapseMode="pin"
-            android:paddingBottom="3dp"/>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+    <edu.ace.infinite.view.CircleImage
+        android:id="@+id/film_btn"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/film_icon"/>
+</RelativeLayout>

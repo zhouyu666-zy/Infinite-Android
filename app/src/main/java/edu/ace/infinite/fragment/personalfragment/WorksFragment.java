@@ -64,9 +64,9 @@ public class WorksFragment extends Fragment {
         isRefreshing = true;
         //获取点赞数据
         new Thread(() -> {
-            Video likeList = VideoHttpUtils.getLikeList();
-            if(likeList != null){
-                List<Video.Data> videoList = likeList.getData();
+            Video userVideoList = VideoHttpUtils.getUserVideoList();
+            if(userVideoList != null){
+                List<Video.Data> videoList = userVideoList.getData();
                 getActivity().runOnUiThread(() -> {
                     adapter.setVideos(videoList);
                     isRefreshing = false;

@@ -55,6 +55,21 @@
             android:name=".activity.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"/>
+        <activity
+            android:name="com.miyouquan.library.DVPermissionUtils$RequestPermissionsActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="edu.ace.infinite.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            tools:replace="android:authorities">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths"
+                tools:replace="android:resource" />
+        </provider>
     </application>
 
 </manifest>

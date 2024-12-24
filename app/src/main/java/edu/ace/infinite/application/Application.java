@@ -6,10 +6,14 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Environment;
+import android.widget.ImageView;
 
 
+import com.bumptech.glide.Glide;
 import com.danikula.videocache.headers.EmptyHeadersInjector;
 import com.danikula.videocache.headers.HeaderInjector;
+import com.devil.library.media.MediaSelectorManager;
+import com.devil.library.media.common.ImageLoader;
 import com.orhanobut.hawk.Hawk;
 
 import java.io.File;
@@ -49,6 +53,13 @@ public class Application extends android.app.Application {
         }
 
         Hawk.init(this).build();
+
+        MediaSelectorManager.getInstance().initImageLoader(new ImageLoader() {
+            @Override
+            public void displayImage(Context context, String path, ImageView imageView) {
+                Glide.with(context).load(path).into(imageView);
+            }
+        });
     }
 
     //视频缓存

@@ -35,6 +35,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.devil.library.media.MediaSelectorManager;
+import com.devil.library.media.config.DVCameraConfig;
+import com.devil.library.media.enumtype.DVCameraType;
+import com.devil.library.media.enumtype.DVMediaType;
+import com.devil.library.media.listener.OnSelectMediaListener;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -43,7 +48,9 @@ import com.hjq.permissions.XXPermissions;
 import com.huantansheng.easyphotos.EasyPhotos;
 import com.huantansheng.easyphotos.models.album.entity.Photo;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 
 import edu.ace.infinite.R;
@@ -55,6 +62,7 @@ import edu.ace.infinite.fragment.personalfragment.FavoritesFragment;
 import edu.ace.infinite.fragment.personalfragment.LikesFragment;
 import edu.ace.infinite.fragment.personalfragment.WorksFragment;
 import edu.ace.infinite.pojo.User;
+import edu.ace.infinite.utils.ConsoleUtils;
 import edu.ace.infinite.utils.GlideEngine;
 import edu.ace.infinite.utils.TimeUtils;
 import edu.ace.infinite.utils.http.UserHttpUtils;
@@ -125,7 +133,7 @@ public class PersonalFragment extends BaseFragment {
     private void setupBackgroundEffect() {
         // 预加载原始图片
         Glide.with(this)
-                .load(R.drawable.video_cover)
+                .load(R.drawable.user_background)
                 .into(backgroundImage);
 
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.BaseOnOffsetChangedListener() {
@@ -158,30 +166,108 @@ public class PersonalFragment extends BaseFragment {
         // 确保 AppBarLayout 初始是展开的
         appBarLayout.setExpanded(true, false);
 
+        ArrayList<Fragment> fragments = new ArrayList<>();
+        fragments.add(new WorksFragment());
+        fragments.add(new LikesFragment());
+        fragments.add(new FavoritesFragment());
         // 设置 ViewPager2 的适配器
         viewPager.setAdapter(new FragmentStateAdapter(this) {
             @NonNull
             @Override
             public Fragment createFragment(int position) {
-                switch (position) {
-                    case 0:
-                        return new WorksFragment();
-                    case 1:
-                        return new LikesFragment();
-                    case 2:
-                        return new FavoritesFragment();
-                    default:
-                        return new WorksFragment();
-                }
+                return fragments.get(position);
             }
 
             @Override
             public int getItemCount() {
-                return 3;
+                return fragments.size();
             }
         });
 
 
+        findViewById(R.id.film_btn).setOnClickListener(view -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+                MyDialog myDialog2 = new MyDialog(getActivity());
+                myDialog2.setTitle("所有文件访问权限");
+                myDialog2.setMessage("由于Android 11以上系统限制，访问相册需要所有文件访问权限");
+                myDialog2.setYesOnclickListener("去开启", () -> {
+                    myDialog2.dismiss();
+                    XXPermissions.with(this)
+                            // 适配 Android 11 需要这样写，这里无需再写 Permission.Group.STORAGE
+                            .permission(Permission.MANAGE_EXTERNAL_STORAGE)
+                            .request((permissions, all) -> {
+                                if (all) {
+                                    EasyPhotos.createAlbum(this, true,false, GlideEngine.getInstance())//参数说明：上下文，是否显示相机按钮，是否使用宽高数据（false时宽高数据为0，扫描速度更快），[配置Glide为图片加载引擎](https://github.com/HuanTanSheng/EasyPhotos/wiki/12-%E9%85%8D%E7%BD%AEImageEngine%EF%BC%8C%E6%94%AF%E6%8C%81%E6%89%80%E6%9C%89%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD%E5%BA%93)
+                                            .setPuzzleMenu(false)
+                                            .setCleanMenu(false)
+                                            .onlyVideo()
+                                            .setFileProviderAuthority("edu.ace.infinite.fileprovider")
+                                            .start(IMAGE_RETURN_CODE);
+                                }
+                            });
+                });
+                myDialog2.setNoOnclickListener("取消", myDialog2::dismiss);
+                myDialog2.show();
+            }else {
+                DVCameraConfig config = MediaSelectorManager.getDefaultCameraConfigBuilder()
+                        //相机的类型(系统照相机、普通照相机、美颜相机)默认普通照相机
+                        .cameraType(DVCameraType.NORMAL)
+                        //是否需要裁剪
+                        .needCrop(true)
+                        //裁剪大小
+                        .cropSize(1, 1, 200, 200)
+                        //媒体类型（如果是使用系统照相机，必须指定DVMediaType.PHOTO或DVMediaType.VIDEO）
+                        .mediaType(DVMediaType.ALL)
+                        //设置录制时长
+                        .maxDuration(10)
+                        //闪光灯是否启用
+                        .flashLightEnable(true)
+                        .build();
+                MediaSelectorManager.openCameraWithConfig(getActivity(), config, new OnSelectMediaListener() {
+                    @Override
+                    public void onSelectMedia(List<String> li_path) {
+                        try {
+                            MyDialog myDialog = new MyDialog(getContext());
+                            myDialog.setTitle("上传视频");
+                            myDialog.isInputDialog(true);
+                            myDialog.setDialogInputHint("请输入视频标题");
+                            myDialog.setYesOnclickListener("确认上传", () -> {
+                                myDialog.dismiss();
+                                String text = myDialog.getDialogInputText();
+                                String path = li_path.get(0);
+                                MyProgressDialog myProgressDialog = new MyProgressDialog(getActivity());
+                                myProgressDialog.setTitleStr("上传视频");
+                                myProgressDialog.setHintStr("正在上传视频，请稍等...");
+                                myProgressDialog.setCanceledOnTouchOutside(false);
+                                myProgressDialog.show();
+                                new Thread(() -> {
+                                    boolean b = UserHttpUtils.uploadVideo(path,text);
+                                    activity.runOnUiThread(() -> {
+                                        if(b){
+                                            MyToast.show("视频上传成功", Toast.LENGTH_LONG,true);
+                                            WorksFragment.refreshList = true;
+                                        }else {
+                                            MyToast.show("视频上传失败，请重试", Toast.LENGTH_LONG,false);
+                                        }
+                                        myProgressDialog.dismiss();
+                                    });
+                                }).start();
+                            });
+                            myDialog.setNoOnclickListener("取消上传", myDialog::dismiss);
+                            myDialog.show();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                });
+//                EasyPhotos.createAlbum(this, true,false, GlideEngine.getInstance())//参数说明：上下文，是否显示相机按钮，是否使用宽高数据（false时宽高数据为0，扫描速度更快），[配置Glide为图片加载引擎](https://github.com/HuanTanSheng/EasyPhotos/wiki/12-%E9%85%8D%E7%BD%AEImageEngine%EF%BC%8C%E6%94%AF%E6%8C%81%E6%89%80%E6%9C%89%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BD%E5%BA%93)
+//                        .setPuzzleMenu(false)
+//                        .setCleanMenu(false)
+//                        .onlyVideo()
+//                        .setFileProviderAuthority("edu.ace.infinite.fileprovider")
+//                        .start(IMAGE_RETURN_CODE);
+            }
+        });
         ivAvatar.setOnClickListener(view12 -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
                 MyDialog myDialog2 = new MyDialog(getActivity());
